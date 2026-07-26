@@ -1,21 +1,21 @@
-INSERT INTO rols (id, name, description) VALUES
+INSERT INTO roles (id, name, description) VALUES
     (1, 'ADMIN', 'Administrador con acceso completo a la plataforma'),
-    (2, 'ARTIST', 'Usuario artista que publica albums y canciones'),
-    (3, 'LISTENER', 'Usuario oyente que crea playlists y reproduce musica');
+    (2, 'MUSICIAN', 'Musico integrante de banda con acceso a repertorios compartidos'),
+    (3, 'SOLO', 'Musico solista con biblioteca y repertorios propios');
 
 INSERT INTO users (id, role_id, username, email, password_hash, display_name, avatar_url, enabled) VALUES
-    (1, 1, 'admin.noe', 'admin.noe@auramusic.local', '$2a$10$seedPasswordHashAdminNoe', 'Noe Admin', 'https://images.auramusic.local/avatars/admin-noe.png', TRUE),
-    (2, 1, 'admin.ops', 'admin.ops@auramusic.local', '$2a$10$seedPasswordHashAdminOps', 'Aura Ops', 'https://images.auramusic.local/avatars/admin-ops.png', TRUE),
-    (3, 2, 'luna.vale', 'luna.vale@auramusic.local', '$2a$10$seedPasswordHashLuna', 'Luna Vale', 'https://images.auramusic.local/avatars/luna-vale.png', TRUE),
-    (4, 2, 'neon.river', 'neon.river@auramusic.local', '$2a$10$seedPasswordHashNeon', 'Neon River', 'https://images.auramusic.local/avatars/neon-river.png', TRUE),
-    (5, 2, 'atlas.nova', 'atlas.nova@auramusic.local', '$2a$10$seedPasswordHashAtlas', 'Atlas Nova', 'https://images.auramusic.local/avatars/atlas-nova.png', TRUE),
-    (6, 2, 'maya.sol', 'maya.sol@auramusic.local', '$2a$10$seedPasswordHashMaya', 'Maya Sol', 'https://images.auramusic.local/avatars/maya-sol.png', TRUE),
-    (7, 3, 'diego.ui', 'diego.ui@auramusic.local', '$2a$10$seedPasswordHashDiego', 'Diego UI', 'https://images.auramusic.local/avatars/diego-ui.png', TRUE),
-    (8, 3, 'sofia.beats', 'sofia.beats@auramusic.local', '$2a$10$seedPasswordHashSofia', 'Sofia Beats', 'https://images.auramusic.local/avatars/sofia-beats.png', TRUE),
-    (9, 3, 'mateo.mix', 'mateo.mix@auramusic.local', '$2a$10$seedPasswordHashMateo', 'Mateo Mix', 'https://images.auramusic.local/avatars/mateo-mix.png', TRUE),
-    (10, 3, 'valeria.wave', 'valeria.wave@auramusic.local', '$2a$10$seedPasswordHashValeria', 'Valeria Wave', 'https://images.auramusic.local/avatars/valeria-wave.png', TRUE),
-    (11, 3, 'andres.lofi', 'andres.lofi@auramusic.local', '$2a$10$seedPasswordHashAndres', 'Andres Lofi', 'https://images.auramusic.local/avatars/andres-lofi.png', TRUE),
-    (12, 3, 'camila.pop', 'camila.pop@auramusic.local', '$2a$10$seedPasswordHashCamila', 'Camila Pop', 'https://images.auramusic.local/avatars/camila-pop.png', TRUE);
+    (1, 1, 'admin.noe', 'admin@auramusic.local', '$2a$10$gHjVfC8g3seYKhccvAADP.4MNg.0j8bvw4NpW.S9H1awRHh6I4Dmm', 'Noe Admin', 'https://images.auramusic.local/avatars/admin-noe.png', TRUE),
+    (2, 1, 'admin.ops', 'admin.ops@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Aura Ops', 'https://images.auramusic.local/avatars/admin-ops.png', TRUE),
+    (3, 2, 'luna.vale', 'luna.vale@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Luna Vale', 'https://images.auramusic.local/avatars/luna-vale.png', TRUE),
+    (4, 2, 'neon.river', 'neon.river@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Neon River', 'https://images.auramusic.local/avatars/neon-river.png', TRUE),
+    (5, 2, 'atlas.nova', 'atlas.nova@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Atlas Nova', 'https://images.auramusic.local/avatars/atlas-nova.png', TRUE),
+    (6, 2, 'maya.sol', 'maya.sol@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Maya Sol', 'https://images.auramusic.local/avatars/maya-sol.png', TRUE),
+    (7, 3, 'diego.ui', 'diego.ui@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Diego UI', 'https://images.auramusic.local/avatars/diego-ui.png', TRUE),
+    (8, 3, 'sofia.beats', 'sofia.beats@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Sofia Beats', 'https://images.auramusic.local/avatars/sofia-beats.png', TRUE),
+    (9, 3, 'mateo.mix', 'mateo.mix@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Mateo Mix', 'https://images.auramusic.local/avatars/mateo-mix.png', TRUE),
+    (10, 3, 'valeria.wave', 'valeria.wave@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Valeria Wave', 'https://images.auramusic.local/avatars/valeria-wave.png', TRUE),
+    (11, 3, 'andres.lofi', 'andres.lofi@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Andres Lofi', 'https://images.auramusic.local/avatars/andres-lofi.png', TRUE),
+    (12, 3, 'camila.pop', 'camila.pop@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Camila Pop', 'https://images.auramusic.local/avatars/camila-pop.png', TRUE);
 
 INSERT INTO artists (id, name, bio, image_url, verified) VALUES
     (1, 'Luna Vale', 'Cantautora de pop atmosferico con sonidos nocturnos.', 'https://images.auramusic.local/artists/luna-vale.png', TRUE),
@@ -41,22 +41,22 @@ INSERT INTO albums (id, artist_id, title, cover_url, release_date) VALUES
     (9, 9, 'Beat District', 'https://images.auramusic.local/albums/beat-district.png', '2025-04-19'),
     (10, 10, 'Campos de Aurora', 'https://images.auramusic.local/albums/campos-aurora.png', '2024-10-10');
 
-INSERT INTO songs (id, artist_id, album_id, title, duration_seconds, genre, audio_url, cover_url, track_number, explicit_content, play_count) VALUES
-    (1, 1, 1, 'Cristal Azul', 214, 'Pop', 'https://audio.auramusic.local/songs/cristal-azul.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 1, FALSE, 12450),
-    (2, 1, 1, 'Luces en Silencio', 198, 'Pop', 'https://audio.auramusic.local/songs/luces-en-silencio.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 2, FALSE, 9800),
-    (3, 2, 2, 'Delta Neon', 243, 'Electronica', 'https://audio.auramusic.local/songs/delta-neon.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 1, FALSE, 20230),
-    (4, 2, 2, 'Circuitos', 226, 'Electronica', 'https://audio.auramusic.local/songs/circuitos.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 2, FALSE, 17590),
-    (5, 3, 3, 'Gravedad Cero', 251, 'Indie Rock', 'https://audio.auramusic.local/songs/gravedad-cero.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 1, FALSE, 8420),
-    (6, 3, 3, 'Mapa Lunar', 233, 'Indie Rock', 'https://audio.auramusic.local/songs/mapa-lunar.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 2, FALSE, 7630),
-    (7, 4, 4, 'Sol de Enero', 207, 'Latin Pop', 'https://audio.auramusic.local/songs/sol-de-enero.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 1, FALSE, 14320),
-    (8, 4, 4, 'Raiz', 219, 'Soul', 'https://audio.auramusic.local/songs/raiz.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 2, FALSE, 11110),
-    (9, 5, 5, 'Muelle Fantasma', 245, 'Alternative', 'https://audio.auramusic.local/songs/muelle-fantasma.mp3', 'https://images.auramusic.local/albums/puerto-invisible.png', 1, FALSE, 6510),
-    (10, 6, 6, 'Soft Thunder', 230, 'Soft Rock', 'https://audio.auramusic.local/songs/soft-thunder.mp3', 'https://images.auramusic.local/albums/northern-velvet.png', 1, FALSE, 7290),
-    (11, 7, 7, 'Club Solar', 204, 'Dance Pop', 'https://audio.auramusic.local/songs/club-solar.mp3', 'https://images.auramusic.local/albums/solar-club.png', 1, FALSE, 18880),
-    (12, 7, 7, 'Verano Digital', 216, 'Dance Pop', 'https://audio.auramusic.local/songs/verano-digital.mp3', 'https://images.auramusic.local/albums/solar-club.png', 2, FALSE, 15940),
-    (13, 8, 8, 'Flor Nocturna', 260, 'Dream Pop', 'https://audio.auramusic.local/songs/flor-nocturna.mp3', 'https://images.auramusic.local/albums/bloom-after-midnight.png', 1, FALSE, 5330),
-    (14, 9, 9, 'Distrito Bajo', 192, 'Trap', 'https://audio.auramusic.local/songs/distrito-bajo.mp3', 'https://images.auramusic.local/albums/beat-district.png', 1, TRUE, 22100),
-    (15, 10, 10, 'Camino Aurora', 238, 'Folk', 'https://audio.auramusic.local/songs/camino-aurora.mp3', 'https://images.auramusic.local/albums/campos-aurora.png', 1, FALSE, 6890);
+INSERT INTO songs (id, artist_id, owner_user_id, album_id, title, lyrics, duration_seconds, genre, original_key, bpm, audio_url, cover_url, track_number, explicit_content, play_count) VALUES
+    (1, 1, 3, 1, 'Cristal Azul', '[VERSO]\n[G]Luz sobre el mar\n[Em]brilla al despertar\n[CORO]\n[C]Cristal azul\n[D]me guia tu voz', 214, 'Pop', 'G', 116, 'https://audio.auramusic.local/songs/cristal-azul.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 1, FALSE, 12450),
+    (2, 1, 3, 1, 'Luces en Silencio', '[VERSO]\n[Am]Calles sin final\n[F]luces al pasar\n[CORO]\n[C]Todo vuelve a sonar\n[G]si te quedas aca', 198, 'Pop', 'C', 104, 'https://audio.auramusic.local/songs/luces-en-silencio.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 2, FALSE, 9800),
+    (3, 2, 4, 2, 'Delta Neon', '[INTRO]\n[Dm]Pulso digital\n[Bb]noche artificial\n[CORO]\n[F]Delta neon\n[C]enciende la ciudad', 243, 'Electronica', 'Dm', 128, 'https://audio.auramusic.local/songs/delta-neon.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 1, FALSE, 20230),
+    (4, 2, 4, 2, 'Circuitos', '[VERSO]\n[Em]Corre la senal\n[C]no puedo parar\n[CORO]\n[G]Circuitos de luz\n[D]me llevan a ti', 226, 'Electronica', 'Em', 122, 'https://audio.auramusic.local/songs/circuitos.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 2, FALSE, 17590),
+    (5, 3, 5, 3, 'Gravedad Cero', '[VERSO]\n[A]Subo sin mirar\n[F#m]dejo de pesar\n[CORO]\n[D]Gravedad cero\n[E]vuelvo a respirar', 251, 'Indie Rock', 'A', 98, 'https://audio.auramusic.local/songs/gravedad-cero.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 1, FALSE, 8420),
+    (6, 3, 5, 3, 'Mapa Lunar', '[VERSO]\n[C]Trazo una senal\n[Am]sobre el vendaval\n[CORO]\n[F]Mapa lunar\n[G]para regresar', 233, 'Indie Rock', 'C', 92, 'https://audio.auramusic.local/songs/mapa-lunar.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 2, FALSE, 7630),
+    (7, 4, 6, 4, 'Sol de Enero', '[VERSO]\n[D]Sol de enero\n[Bm]sobre mi piel\n[CORO]\n[G]Canta la raiz\n[A]vuelve a crecer', 207, 'Latin Pop', 'D', 112, 'https://audio.auramusic.local/songs/sol-de-enero.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 1, FALSE, 14320),
+    (8, 4, 6, 4, 'Raiz', '[VERSO]\n[Am]Vengo del sur\n[F]con fuego y luz\n[CORO]\n[C]Raiz de mi voz\n[G]late en tu cancion', 219, 'Soul', 'Am', 86, 'https://audio.auramusic.local/songs/raiz.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 2, FALSE, 11110),
+    (9, 5, 7, 5, 'Muelle Fantasma', '[VERSO]\n[Em]Muelle sin final\n[C]barcos al azar\n[CORO]\n[G]Fantasma del mar\n[D]no me dejes atras', 245, 'Alternative', 'Em', 90, 'https://audio.auramusic.local/songs/muelle-fantasma.mp3', 'https://images.auramusic.local/albums/puerto-invisible.png', 1, FALSE, 6510),
+    (10, 6, 8, 6, 'Soft Thunder', '[VERSO]\n[E]Soft thunder rain\n[C#m]falling again\n[CORO]\n[A]Hold the night\n[B]turn on the light', 230, 'Soft Rock', 'E', 96, 'https://audio.auramusic.local/songs/soft-thunder.mp3', 'https://images.auramusic.local/albums/northern-velvet.png', 1, FALSE, 7290),
+    (11, 7, 9, 7, 'Club Solar', '[VERSO]\n[F]Brilla el lugar\n[Dm]no quiero parar\n[CORO]\n[Bb]Club solar\n[C]vamos a bailar', 204, 'Dance Pop', 'F', 124, 'https://audio.auramusic.local/songs/club-solar.mp3', 'https://images.auramusic.local/albums/solar-club.png', 1, FALSE, 18880),
+    (12, 7, 9, 7, 'Verano Digital', '[VERSO]\n[G]Verano digital\n[Em]playa virtual\n[CORO]\n[C]Sube la senal\n[D]no mires atras', 216, 'Dance Pop', 'G', 126, 'https://audio.auramusic.local/songs/verano-digital.mp3', 'https://images.auramusic.local/albums/solar-club.png', 2, FALSE, 15940),
+    (13, 8, 10, 8, 'Flor Nocturna', '[VERSO]\n[Bm]Flor nocturna\n[G]cerca de mi\n[CORO]\n[D]Abre tu luz\n[A]dejame seguir', 260, 'Dream Pop', 'Bm', 80, 'https://audio.auramusic.local/songs/flor-nocturna.mp3', 'https://images.auramusic.local/albums/bloom-after-midnight.png', 1, FALSE, 5330),
+    (14, 9, 11, 9, 'Distrito Bajo', '[VERSO]\n[Cm]Distrito bajo\n[Ab]suena en la estacion\n[CORO]\n[Eb]Sube el bajo\n[Bb]late el corazon', 192, 'Trap', 'Cm', 140, 'https://audio.auramusic.local/songs/distrito-bajo.mp3', 'https://images.auramusic.local/albums/beat-district.png', 1, TRUE, 22100),
+    (15, 10, 12, 10, 'Camino Aurora', '[VERSO]\n[D]Camino aurora\n[G]vuelve a nacer\n[CORO]\n[Bm]Canta la tierra\n[A]al amanecer', 238, 'Folk', 'D', 78, 'https://audio.auramusic.local/songs/camino-aurora.mp3', 'https://images.auramusic.local/albums/campos-aurora.png', 1, FALSE, 6890);
 
 INSERT INTO playlists (id, user_id, name, description, cover_url, public) VALUES
     (1, 7, 'Dark Glass Coding', 'Musica para programar interfaces de noche.', 'https://images.auramusic.local/playlists/dark-glass-coding.png', TRUE),
@@ -94,3 +94,39 @@ INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
     (9, 12, 2),
     (10, 15, 1),
     (10, 7, 2);
+
+INSERT INTO bands (id, leader_user_id, name, description, invite_code) VALUES
+    (1, 3, 'Luna Session Band', 'Banda de apoyo para shows de Luna Vale.', 'LUNA-2026-AURA'),
+    (2, 4, 'Neon River Live', 'Formato en vivo de Neon River con musicos invitados.', 'NEON-2026-AURA'),
+    (3, 5, 'Atlas Nova Crew', 'Agrupacion indie para repertorios electricos.', 'ATLAS-2026-AURA');
+
+INSERT INTO band_members (id, band_id, user_id, instrument, member_role) VALUES
+    (1, 1, 3, 'Voz principal', 'LEADER'),
+    (2, 1, 7, 'Guitarra principal', 'MEMBER'),
+    (3, 1, 8, 'Teclado', 'MEMBER'),
+    (4, 2, 4, 'Sintetizadores', 'LEADER'),
+    (5, 2, 9, 'Bateria electronica', 'MEMBER'),
+    (6, 2, 10, 'Bajo', 'MEMBER'),
+    (7, 3, 5, 'Guitarra ritmica', 'LEADER'),
+    (8, 3, 11, 'Bateria', 'MEMBER'),
+    (9, 3, 12, 'Coros', 'MEMBER');
+
+INSERT INTO setlists (id, owner_user_id, band_id, name, description, event_date) VALUES
+    (1, 3, 1, 'Show Electrico Luna', 'Repertorio principal para concierto nocturno.', '2026-07-29'),
+    (2, 4, 2, 'Neon Club Session', 'Set electronico para evento en club.', '2026-08-02'),
+    (3, 5, 3, 'Atlas Indie Night', 'Setlist indie rock con pausas cortas.', '2026-08-09'),
+    (4, 12, NULL, 'Camila Solo Acustico', 'Repertorio personal de musico solista.', '2026-08-16');
+
+INSERT INTO setlist_items (id, setlist_id, song_id, position, transpose_steps, break_seconds, notes) VALUES
+    (1, 1, 1, 1, 0, 15, 'Abrir con luces bajas'),
+    (2, 1, 2, 2, 1, 30, 'Subir un semitono para la voz invitada'),
+    (3, 1, 7, 3, 0, 45, 'Presentar a la banda antes del coro'),
+    (4, 2, 3, 1, 0, 10, 'Entrada con click track'),
+    (5, 2, 4, 2, -1, 20, 'Transicion directa'),
+    (6, 2, 11, 3, 0, 30, 'Final extendido'),
+    (7, 3, 5, 1, 0, 20, 'Afinacion estandar'),
+    (8, 3, 6, 2, 2, 30, 'Version mas brillante'),
+    (9, 3, 10, 3, 0, 60, 'Pausa para cambio de guitarra'),
+    (10, 4, 15, 1, 0, 15, 'Inicio acustico'),
+    (11, 4, 13, 2, -2, 30, 'Tono mas comodo'),
+    (12, 4, 8, 3, 0, 45, 'Cierre con coros');

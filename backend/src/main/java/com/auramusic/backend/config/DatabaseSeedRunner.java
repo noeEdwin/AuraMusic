@@ -22,7 +22,7 @@ public class DatabaseSeedRunner implements CommandLineRunner{
     
     @Override
     public void run(String... args){
-        Integer roleCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM rols", Integer.class);
+        Integer roleCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM roles", Integer.class);
 
         if (roleCount != null && roleCount > 0){
             return;
