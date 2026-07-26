@@ -1,30 +1,19 @@
 import './App.css'
-import { FavoritesCard } from './components/dashboard/FavoritesCard'
-import { MembersCard } from './components/dashboard/MembersCard'
-import { VenueCard } from './components/dashboard/VenueCard'
-import { Sidebar } from './components/layout/Sidebar'
-import { TopBar } from './components/layout/TopBar'
-import { SetlistPanel } from './components/setlist/SetlistPanel'
+import { LoginView } from './components/auth/LoginView'
+import { RegisterView } from './components/auth/RegisterView'
+import { DashboardView } from './components/dashboard/DashboardView'
 
 function App() {
+  const requestedView = new URLSearchParams(window.location.search).get('view')
+
+  const views = {
+    dashboard: <DashboardView />,
+    login: <LoginView />,
+    register: <RegisterView />,
+  }
+
   return (
-    <div className="app-shell">
-      <Sidebar />
-
-      <div className="main-layout">
-        <TopBar />
-
-        <main className="content-grid">
-          <SetlistPanel />
-
-          <div className="side-column">
-            <VenueCard />
-            <MembersCard />
-            <FavoritesCard />
-          </div>
-        </main>
-      </div>
-    </div>
+    views[requestedView] ?? <DashboardView />
   )
 }
 

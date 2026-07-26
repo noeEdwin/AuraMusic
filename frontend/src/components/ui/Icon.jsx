@@ -15,6 +15,12 @@ export function Icon({ type }) {
         <path d="M6.5 19a5.5 5.5 0 0 1 11 0" />
       </>
     ),
+    userCircle: (
+      <>
+        <circle cx="12" cy="9" r="3" />
+        <path d="M6.5 18.5a5.5 5.5 0 0 1 11 0" />
+      </>
+    ),
     list: (
       <>
         <path d="M9 7h10" />
@@ -39,10 +45,35 @@ export function Icon({ type }) {
         <path d="M4 17h16" />
       </>
     ),
+    mail: (
+      <>
+        <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5v9A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5Z" />
+        <path d="m5 8 7 5 7-5" />
+      </>
+    ),
+    phone: (
+      <>
+        <path d="M8 4.5h8" />
+        <path d="M9 3.5h6A1.5 1.5 0 0 1 16.5 5v14A1.5 1.5 0 0 1 15 20.5H9A1.5 1.5 0 0 1 7.5 19V5A1.5 1.5 0 0 1 9 3.5Z" />
+        <path d="M11 17.5h2" />
+      </>
+    ),
     pin: (
       <>
         <path d="M12 20s6-5.44 6-10a6 6 0 1 0-12 0c0 4.56 6 10 6 10Z" />
         <circle cx="12" cy="10" r="2" />
+      </>
+    ),
+    lock: (
+      <>
+        <rect x="5.5" y="10" width="13" height="9.5" rx="2" />
+        <path d="M8.5 10V8a3.5 3.5 0 1 1 7 0v2" />
+      </>
+    ),
+    eye: (
+      <>
+        <path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z" />
+        <circle cx="12" cy="12" r="2.5" />
       </>
     ),
     play: <path d="M9 7.5v9l7-4.5-7-4.5Z" fill="currentColor" stroke="none" />,
