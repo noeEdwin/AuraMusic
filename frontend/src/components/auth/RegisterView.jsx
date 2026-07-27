@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
+import { StatusBanner } from '../shared/StatusBanner'
 import { AuthField } from './AuthField'
 import { AuthLayout } from './AuthLayout'
 import { PasswordField } from './PasswordField'
@@ -11,7 +12,7 @@ import { getPasswordStrength, validateRegister } from './authValidation'
 
 export function RegisterView() {
   const navigate = useNavigate()
-  const { register } = useAuth()
+  const { authFeedback, clearAuthFeedback, register } = useAuth()
   const [values, setValues] = useState({
     fullName: '',
     phone: '',
@@ -36,6 +37,7 @@ export function RegisterView() {
       ...current,
       [name]: name === 'phone' ? value.replace(/\D/g, '') : value,
     }))
+    clearAuthFeedback()
     setSubmitError('')
     markTouched(name)
   }
@@ -94,6 +96,8 @@ export function RegisterView() {
       )}
     >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        <StatusBanner message={authFeedback?.message} tone={authFeedback?.tone} />
+
         <AuthField
           autoComplete="name"
           error={getFieldError('fullName')}
@@ -153,7 +157,7 @@ export function RegisterView() {
           value={values.password}
         />
 
-        {submitError ? <p className="auth-submit-error">{submitError}</p> : null}
+        <StatusBanner message={submitError} tone="error" />
 
         <button className="auth-primary-button" type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Registrando...' : 'Registrarse'}
