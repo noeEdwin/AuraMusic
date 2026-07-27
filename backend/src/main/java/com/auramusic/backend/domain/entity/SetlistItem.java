@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "setlist_items", uniqueConstraints = @UniqueConstraint(name = "uq_setlist_items_position", columnNames = {"setlist_id", "position"}))
@@ -40,7 +41,8 @@ public class SetlistItem {
     @Column(length = 255)
     private String notes;
 
-    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     public Long getId() { return id; }

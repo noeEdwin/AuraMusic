@@ -27,9 +27,6 @@ public class Artist {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    @Column(nullable = false)
-    private Boolean verified = false;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -46,8 +43,6 @@ public class Artist {
     public void setBio(String bio) { this.bio = bio; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    public Boolean getVerified() { return verified; }
-    public void setVerified(Boolean verified) { this.verified = verified; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

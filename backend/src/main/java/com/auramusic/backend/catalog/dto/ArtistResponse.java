@@ -6,16 +6,14 @@ public record ArtistResponse(
         Long id,
         String name,
         String bio,
-        String imageUrl,
-        Boolean verified
+        String imageUrl
 ) {
     public static ArtistResponse from(Artist artist) {
         return new ArtistResponse(
                 artist.getId(),
                 artist.getName(),
                 artist.getBio(),
-                artist.getImageUrl(),
-                artist.getVerified()
+                artist.getImageUrl()
         );
     }
 }
