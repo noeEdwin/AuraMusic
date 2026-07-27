@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "band_members", uniqueConstraints = @UniqueConstraint(name = "uq_band_members_band_user", columnNames = {"band_id", "user_id"}))
@@ -34,7 +35,8 @@ public class BandMember {
     @Column(name = "member_role", nullable = false, length = 50)
     private String memberRole;
 
-    @Column(name = "joined_at", nullable = false, insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt;
 
     public Long getId() { return id; }

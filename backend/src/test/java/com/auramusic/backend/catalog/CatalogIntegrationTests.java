@@ -51,6 +51,12 @@ class CatalogIntegrationTests {
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM setlist_items");
+        jdbcTemplate.update("DELETE FROM setlists");
+        jdbcTemplate.update("DELETE FROM playlist_songs");
+        jdbcTemplate.update("DELETE FROM playlists");
+        jdbcTemplate.update("DELETE FROM band_members");
+        jdbcTemplate.update("DELETE FROM bands");
         songRepository.deleteAll();
         artistRepository.deleteAll();
         userRepository.deleteAll();
