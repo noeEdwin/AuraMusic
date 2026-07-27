@@ -2,6 +2,8 @@ import './App.css'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginView } from './components/auth/LoginView'
+import { ArtistsCatalogView } from './components/catalog/ArtistsCatalogView'
+import { SongsCatalogView } from './components/catalog/SongsCatalogView'
 import { RegisterView } from './components/auth/RegisterView'
 import { AdminView } from './components/dashboard/AdminView'
 import { DashboardView } from './components/dashboard/DashboardView'
@@ -34,6 +36,22 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <DashboardView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/songs"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <SongsCatalogView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/artists"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <ArtistsCatalogView />
           </ProtectedRoute>
         )}
       />
