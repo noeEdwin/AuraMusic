@@ -38,14 +38,14 @@ export function SetlistPanel() {
 
         {songs.map((song) => (
           <div key={song.number} className={`songs-row${song.active ? ' active' : ''}`} role="row">
-            <span>{song.number}</span>
-            <span className="song-title">
+            <span className="songs-cell songs-index" data-label="#">{song.number}</span>
+            <span className="song-title songs-cell songs-title-cell" data-label="Titulo">
               {song.active ? <span className="row-play">▸</span> : null}
               {song.title}
             </span>
-            <span className="song-key">{song.key}</span>
-            <span>{song.bpm}</span>
-            <span>{song.duration}</span>
+            <span className="song-key songs-cell" data-label="Tono">{song.key}</span>
+            <span className="songs-cell" data-label="BPM">{song.bpm}</span>
+            <span className="songs-cell" data-label="Duracion">{song.duration}</span>
           </div>
         ))}
       </div>
