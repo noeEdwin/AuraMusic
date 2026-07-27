@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
@@ -6,6 +8,7 @@ import { Icon } from '../ui/Icon'
 export function TopBar() {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const displayName = user?.displayName ?? 'Invitado'
   const email = user?.email ?? 'sin-correo'
@@ -18,8 +21,14 @@ export function TopBar() {
     .join('') || 'AM'
 
   async function handleLogout() {
-    await logout()
-    navigate('/login')
+    setIsLoggingOut(true)
+
+    try {
+      await logout()
+      navigate('/login')
+    } finally {
+      setIsLoggingOut(false)
+    }
   }
 
   return (
@@ -45,9 +54,9 @@ export function TopBar() {
           <div className="profile-avatar">{avatarInitials}</div>
         </div>
 
-        <button className="logout-button" type="button" onClick={handleLogout}>
+        <button className="logout-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
           <Icon type="logout" />
-          <span>Logout</span>
+          <span>{isLoggingOut ? 'Cerrando...' : 'Logout'}</span>
         </button>
       </div>
     </header>

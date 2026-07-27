@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
+import { StatusBanner } from '../shared/StatusBanner'
 import { AuthField } from './AuthField'
 import { AuthLayout } from './AuthLayout'
 import { PasswordField } from './PasswordField'
@@ -12,7 +13,7 @@ import { validateLogin } from './authValidation'
 export function LoginView() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { authFeedback, clearAuthFeedback, login } = useAuth()
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -34,6 +35,7 @@ export function LoginView() {
       ...current,
       [name]: value,
     }))
+    clearAuthFeedback()
     setSubmitError('')
     markTouched(name)
   }
@@ -84,6 +86,11 @@ export function LoginView() {
       )}
     >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        <StatusBanner
+          message={location.state?.from ? 'Inicia sesion para continuar con la ruta solicitada.' : authFeedback?.message}
+          tone={location.state?.from ? 'info' : authFeedback?.tone}
+        />
+
         <AuthField
           autoComplete="email"
           error={getFieldError('email')}
@@ -110,7 +117,7 @@ export function LoginView() {
           value={values.password}
         />
 
-        {submitError ? <p className="auth-submit-error">{submitError}</p> : null}
+        <StatusBanner message={submitError} tone="error" />
 
         <button className="auth-primary-button" type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Ingresando...' : 'Ingresar'}
