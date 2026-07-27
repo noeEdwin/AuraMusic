@@ -35,13 +35,10 @@ public class ArtistService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ArtistResponse> search(String name, Boolean verified, Pageable pageable) {
+    public PageResponse<ArtistResponse> search(String name, Pageable pageable) {
         Specification<Artist> specification = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
         if (hasText(name)) {
             specification = specification.and(ArtistSpecifications.nameContains(name));
-        }
-        if (verified != null) {
-            specification = specification.and(ArtistSpecifications.verifiedEquals(verified));
         }
 
         Page<ArtistResponse> page = artistRepository.findAll(specification, normalize(pageable))
@@ -65,7 +62,6 @@ public class ArtistService {
         artist.setName(request.name().trim());
         artist.setBio(normalize(request.bio()));
         artist.setImageUrl(normalize(request.imageUrl()));
-        artist.setVerified(false);
         return ArtistResponse.from(artistRepository.save(artist));
     }
 
@@ -81,9 +77,6 @@ public class ArtistService {
         artist.setName(request.name().trim());
         artist.setBio(normalize(request.bio()));
         artist.setImageUrl(normalize(request.imageUrl()));
-        if (request.verified() != null) {
-            artist.setVerified(request.verified());
-        }
         return ArtistResponse.from(artistRepository.save(artist));
     }
 

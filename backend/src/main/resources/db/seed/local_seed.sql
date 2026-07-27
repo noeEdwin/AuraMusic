@@ -17,17 +17,17 @@ INSERT INTO users (id, role_id, username, email, password_hash, display_name, av
     (11, 3, 'andres.lofi', 'andres.lofi@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Andres Lofi', 'https://images.auramusic.local/avatars/andres-lofi.png', TRUE),
     (12, 3, 'camila.pop', 'camila.pop@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Camila Pop', 'https://images.auramusic.local/avatars/camila-pop.png', TRUE);
 
-INSERT INTO artists (id, name, bio, image_url, verified) VALUES
-    (1, 'Luna Vale', 'Cantautora de pop atmosferico con sonidos nocturnos.', 'https://images.auramusic.local/artists/luna-vale.png', TRUE),
-    (2, 'Neon River', 'Duo electronico con sintetizadores brillantes y bajos profundos.', 'https://images.auramusic.local/artists/neon-river.png', TRUE),
-    (3, 'Atlas Nova', 'Productor de indie rock espacial y texturas analogas.', 'https://images.auramusic.local/artists/atlas-nova.png', TRUE),
-    (4, 'Maya Sol', 'Vocalista latina con mezcla de soul, pop y ritmos calidos.', 'https://images.auramusic.local/artists/maya-sol.png', TRUE),
-    (5, 'Echo Harbor', 'Proyecto alternativo inspirado en paisajes costeros.', 'https://images.auramusic.local/artists/echo-harbor.png', FALSE),
-    (6, 'Velvet North', 'Banda de rock suave con guitarras ambientales.', 'https://images.auramusic.local/artists/velvet-north.png', FALSE),
-    (7, 'Solar Kids', 'Colectivo juvenil de dance pop y hooks luminosos.', 'https://images.auramusic.local/artists/solar-kids.png', TRUE),
-    (8, 'Midnight Bloom', 'Proyecto dream pop con voces etereas.', 'https://images.auramusic.local/artists/midnight-bloom.png', FALSE),
-    (9, 'Rocco Beats', 'Beatmaker urbano enfocado en trap melodico.', 'https://images.auramusic.local/artists/rocco-beats.png', TRUE),
-    (10, 'Aurora Fields', 'Compositora de folk moderno y arreglos acusticos.', 'https://images.auramusic.local/artists/aurora-fields.png', FALSE);
+INSERT INTO artists (id, name, bio, image_url) VALUES
+    (1, 'Luna Vale', 'Cantautora de pop atmosferico con sonidos nocturnos.', 'https://images.auramusic.local/artists/luna-vale.png'),
+    (2, 'Neon River', 'Duo electronico con sintetizadores brillantes y bajos profundos.', 'https://images.auramusic.local/artists/neon-river.png'),
+    (3, 'Atlas Nova', 'Productor de indie rock espacial y texturas analogas.', 'https://images.auramusic.local/artists/atlas-nova.png'),
+    (4, 'Maya Sol', 'Vocalista latina con mezcla de soul, pop y ritmos calidos.', 'https://images.auramusic.local/artists/maya-sol.png'),
+    (5, 'Echo Harbor', 'Proyecto alternativo inspirado en paisajes costeros.', 'https://images.auramusic.local/artists/echo-harbor.png'),
+    (6, 'Velvet North', 'Banda de rock suave con guitarras ambientales.', 'https://images.auramusic.local/artists/velvet-north.png'),
+    (7, 'Solar Kids', 'Colectivo juvenil de dance pop y hooks luminosos.', 'https://images.auramusic.local/artists/solar-kids.png'),
+    (8, 'Midnight Bloom', 'Proyecto dream pop con voces etereas.', 'https://images.auramusic.local/artists/midnight-bloom.png'),
+    (9, 'Rocco Beats', 'Beatmaker urbano enfocado en trap melodico.', 'https://images.auramusic.local/artists/rocco-beats.png'),
+    (10, 'Aurora Fields', 'Compositora de folk moderno y arreglos acusticos.', 'https://images.auramusic.local/artists/aurora-fields.png');
 
 INSERT INTO albums (id, artist_id, title, cover_url, release_date) VALUES
     (1, 1, 'Noche Cristal', 'https://images.auramusic.local/albums/noche-cristal.png', '2025-02-14'),

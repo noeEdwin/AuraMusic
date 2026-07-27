@@ -77,8 +77,8 @@ class CatalogIntegrationTests {
                 """, adminRoleId);
 
         jdbcTemplate.update("""
-                INSERT INTO artists (name, bio, verified, created_at, updated_at)
-                VALUES ('Luna Vale', 'Pop atmosferico', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                INSERT INTO artists (name, bio, created_at, updated_at)
+                VALUES ('Luna Vale', 'Pop atmosferico', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """);
         seededArtist = artistRepository.findAll().get(0);
 
@@ -107,13 +107,11 @@ class CatalogIntegrationTests {
 
     @Test
     @WithMockUser(username = "musician@auramusic.local", roles = "MUSICIAN")
-    void filtersArtistsByNameAndVerifiedStatus() throws Exception {
+    void filtersArtistsByName() throws Exception {
         mockMvc.perform(get("/api/artists")
-                        .param("name", "luna")
-                        .param("verified", "true"))
+                        .param("name", "luna"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Luna Vale"))
-                .andExpect(jsonPath("$.content[0].verified").value(true))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
 

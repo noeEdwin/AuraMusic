@@ -14,8 +14,4 @@ final class ArtistSpecifications {
                 "%" + name.trim().toLowerCase() + "%"
         );
     }
-
-    static Specification<Artist> verifiedEquals(Boolean verified) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("verified"), verified);
-    }
 }

@@ -34,10 +34,9 @@ public class ArtistController {
     @GetMapping
     public PageResponse<ArtistResponse> search(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Boolean verified,
             @PageableDefault(size = 10, sort = "name") Pageable pageable
     ) {
-        return artistService.search(name, verified, pageable);
+        return artistService.search(name, pageable);
     }
 
     @GetMapping("/{id}")
