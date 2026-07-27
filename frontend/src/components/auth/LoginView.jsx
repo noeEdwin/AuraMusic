@@ -1,16 +1,25 @@
 import { useState } from 'react'
 
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+import { useAuth } from '../../auth/useAuth'
+import { getApiErrorMessage } from '../../lib/api'
 import { AuthField } from './AuthField'
 import { AuthLayout } from './AuthLayout'
 import { PasswordField } from './PasswordField'
 import { validateLogin } from './authValidation'
 
 export function LoginView() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { login } = useAuth()
   const [values, setValues] = useState({
     email: '',
     password: '',
   })
   const [touchedFields, setTouchedFields] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const errors = validateLogin(values)
 
@@ -25,6 +34,7 @@ export function LoginView() {
       ...current,
       [name]: value,
     }))
+    setSubmitError('')
     markTouched(name)
   }
 
@@ -32,9 +42,29 @@ export function LoginView() {
     markTouched(event.target.name)
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setTouchedFields({ email: true, password: true })
+    const nextTouchedFields = { email: true, password: true }
+    setTouchedFields(nextTouchedFields)
+
+    if (Object.keys(errors).length > 0) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const session = await login({
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+      })
+      const nextRoute = location.state?.from ?? (session.user.role === 'ADMIN' ? '/admin' : '/dashboard')
+      navigate(nextRoute, { replace: true })
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, 'No fue posible iniciar sesion.'))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function getFieldError(name) {
@@ -49,7 +79,7 @@ export function LoginView() {
       footer={(
         <p>
           <span>Aun no tienes cuenta? </span>
-          <a href="?view=register">Registrate</a>
+          <Link to="/register">Registrate</Link>
         </p>
       )}
     >
@@ -80,7 +110,11 @@ export function LoginView() {
           value={values.password}
         />
 
-        <button className="auth-primary-button" type="submit">Ingresar</button>
+        {submitError ? <p className="auth-submit-error">{submitError}</p> : null}
+
+        <button className="auth-primary-button" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+        </button>
       </form>
     </AuthLayout>
   )

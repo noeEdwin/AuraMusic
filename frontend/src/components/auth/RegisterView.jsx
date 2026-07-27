@@ -1,11 +1,17 @@
 import { useState } from 'react'
 
+import { Link, useNavigate } from 'react-router-dom'
+
+import { useAuth } from '../../auth/useAuth'
+import { getApiErrorMessage } from '../../lib/api'
 import { AuthField } from './AuthField'
 import { AuthLayout } from './AuthLayout'
 import { PasswordField } from './PasswordField'
 import { getPasswordStrength, validateRegister } from './authValidation'
 
 export function RegisterView() {
+  const navigate = useNavigate()
+  const { register } = useAuth()
   const [values, setValues] = useState({
     fullName: '',
     phone: '',
@@ -13,6 +19,8 @@ export function RegisterView() {
     password: '',
   })
   const [touchedFields, setTouchedFields] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const errors = validateRegister(values)
   const passwordStrength = getPasswordStrength(values.password)
@@ -28,6 +36,7 @@ export function RegisterView() {
       ...current,
       [name]: name === 'phone' ? value.replace(/\D/g, '') : value,
     }))
+    setSubmitError('')
     markTouched(name)
   }
 
@@ -35,14 +44,38 @@ export function RegisterView() {
     markTouched(event.target.name)
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setTouchedFields({
+    const nextTouchedFields = {
       fullName: true,
       phone: true,
       email: true,
       password: true,
-    })
+    }
+
+    setTouchedFields(nextTouchedFields)
+
+    if (Object.keys(errors).length > 0) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const session = await register({
+        username: buildUsername(values.fullName),
+        displayName: values.fullName.trim(),
+        phone: values.phone.trim(),
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+        role: 'MUSICIAN',
+      })
+      navigate(session.user.role === 'ADMIN' ? '/admin' : '/dashboard', { replace: true })
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, 'No fue posible crear la cuenta.'))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function getFieldError(name) {
@@ -56,7 +89,7 @@ export function RegisterView() {
       footer={(
         <p>
           <span>Ya tienes cuenta? </span>
-          <a href="?view=login">Inicia sesion</a>
+          <Link to="/login">Inicia sesion</Link>
         </p>
       )}
     >
@@ -120,8 +153,24 @@ export function RegisterView() {
           value={values.password}
         />
 
-        <button className="auth-primary-button" type="submit">Registrarse</button>
+        {submitError ? <p className="auth-submit-error">{submitError}</p> : null}
+
+        <button className="auth-primary-button" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Registrando...' : 'Registrarse'}
+        </button>
       </form>
     </AuthLayout>
   )
+}
+
+function buildUsername(fullName) {
+  return fullName
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .join('.')
 }
