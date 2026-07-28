@@ -181,7 +181,13 @@ public class SetlistService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La lista de items no coincide con el setlist");
         }
 
-        items.forEach(item -> item.setPosition(-item.getId().intValue()));
+        int temporaryBase = items.stream()
+                .mapToInt(SetlistItem::getPosition)
+                .max()
+                .orElse(0) + items.size() + 1;
+        for (int index = 0; index < items.size(); index++) {
+            items.get(index).setPosition(temporaryBase + index);
+        }
         itemRepository.saveAllAndFlush(items);
         for (int index = 0; index < request.itemIds().size(); index++) {
             findItem(id, request.itemIds().get(index)).setPosition(index + 1);

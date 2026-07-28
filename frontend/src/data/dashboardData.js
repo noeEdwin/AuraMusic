@@ -3,7 +3,7 @@ export const navigationItems = [
   { label: 'Panel admin', icon: 'shield', path: '/admin', roles: ['ADMIN'] },
   { label: 'Canciones', icon: 'note', path: '/songs' },
   { label: 'Artistas', icon: 'user', path: '/artists' },
-  { label: 'SetLists', icon: 'list' },
+  { label: 'SetLists', icon: 'list', path: '/setlists' },
   { label: 'Configuracion', icon: 'gear' },
 ]
 

@@ -37,10 +37,6 @@ export function Sidebar({ isOpen = false, onNavigate, onToggle }) {
         ))}
       </nav>
 
-      <button className="create-setlist" type="button">
-        <span className="create-setlist-plus">+</span>
-        <span>Agregar Setlist</span>
-      </button>
     </aside>
   )
 }

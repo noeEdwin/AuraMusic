@@ -11,6 +11,7 @@ import { ProtectedRoute } from './components/routing/ProtectedRoute'
 import { PublicOnlyRoute } from './components/routing/PublicOnlyRoute'
 import { UnauthorizedView } from './components/shared/UnauthorizedView'
 import { TeleprompterView } from './components/teleprompter/TeleprompterView'
+import { SetlistsView } from './components/setlist/SetlistsView'
 
 function App() {
   return (
@@ -61,6 +62,22 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <TeleprompterView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/setlists"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <SetlistsView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/setlists/:setlistId"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <SetlistsView />
           </ProtectedRoute>
         )}
       />
