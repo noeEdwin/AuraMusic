@@ -37,14 +37,18 @@ public class SongController {
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) Long artistId,
             @RequestParam(required = false) Long ownerId,
-            @PageableDefault(size = 10, sort = "title") Pageable pageable
+            @PageableDefault(size = 10, sort = "title") Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return songService.search(title, genre, artistId, ownerId, pageable);
+        return songService.search(title, genre, artistId, ownerId, pageable, userDetails.getUsername());
     }
 
     @GetMapping("/{id}")
-    public SongResponse getById(@PathVariable Long id) {
-        return songService.getById(id);
+    public SongResponse getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return songService.getById(id, userDetails.getUsername());
     }
 
     @PostMapping

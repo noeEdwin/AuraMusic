@@ -7,10 +7,11 @@ import { getApiErrorMessage } from '../../lib/api'
 import { createLiveSessionClient } from '../../live/liveSessionClient'
 import { fetchSetlist } from '../../setlists/setlistsApi'
 import { parseTeleprompterSections } from '../../teleprompter/teleprompterParser'
-import { mockTeleprompterSongs } from '../../teleprompter/mockTeleprompterSongs'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import { Icon } from '../ui/Icon'
+import '../catalog/catalog.css'
+import './teleprompter.css'
 
 const TELEPROMPTER_PAGE_SIZE = 20
 const AUTO_SCROLL_PIXELS_PER_SECOND = 42
@@ -59,7 +60,6 @@ export function TeleprompterView() {
           setlistId ? fetchSetlist(setlistId) : Promise.resolve(null),
         ])
         const candidateSongs = [
-          ...mockTeleprompterSongs,
           ...(requestedSetlist?.items ?? []).map((item) => item.song).filter(Boolean),
           ...(data.content ?? []).filter((song) => song.lyrics),
         ]
@@ -79,8 +79,7 @@ export function TeleprompterView() {
               return current
             }
 
-            const preferredSong = songsWithLyrics.find((song) => song.id === 'mock-kumbala')
-            return String(preferredSong?.id ?? songsWithLyrics[0]?.id ?? '')
+            return String(songsWithLyrics[0]?.id ?? '')
           })
         }
       } catch (requestError) {
@@ -114,7 +113,7 @@ export function TeleprompterView() {
     () => songs.find((song) => String(song.id) === selectedSongId) ?? null,
     [selectedSongId, songs],
   )
-  const canPersistSelectedSong = selectedSong?.id != null && !String(selectedSong.id).startsWith('mock-')
+  const canPersistSelectedSong = selectedSong?.id != null
 
   const parsedSections = useMemo(
     () => parseTeleprompterSections(selectedSong?.lyrics ?? '', transposeSteps),
@@ -395,7 +394,6 @@ export function TeleprompterView() {
                   <p className="eyebrow">Letra y acordes</p>
                   <h2>{selectedSong.title}</h2>
                 </div>
-                {!canPersistSelectedSong ? <span className="catalog-local-tag">Demo local sin guardado API</span> : null}
               </div>
 
               <textarea

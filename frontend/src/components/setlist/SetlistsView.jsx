@@ -18,6 +18,8 @@ import {
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import { Icon } from '../ui/Icon'
+import '../catalog/catalog.css'
+import './setlists.css'
 
 export function SetlistsView() {
   const { setlistId } = useParams()

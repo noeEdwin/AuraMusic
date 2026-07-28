@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
+import '../catalog/catalog.css'
 
 const EMPTY_CREATE_FORM = { name: '', description: '', instrument: '' }
 const EMPTY_JOIN_FORM = { inviteCode: '', instrument: '' }

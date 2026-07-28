@@ -66,7 +66,7 @@ export function RegisterView() {
     setIsSubmitting(true)
 
     try {
-      const session = await register({
+      await register({
         username: buildUsername(values.fullName),
         displayName: values.fullName.trim(),
         phone: values.phone.trim(),
@@ -74,7 +74,13 @@ export function RegisterView() {
         password: values.password,
          role: values.role,
       })
-      navigate(session.user.role === 'ADMIN' ? '/admin' : '/dashboard', { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: {
+          registered: true,
+          email: values.email.trim().toLowerCase(),
+        },
+      })
     } catch (error) {
       setSubmitError(getApiErrorMessage(error, 'No fue posible crear la cuenta.'))
     } finally {

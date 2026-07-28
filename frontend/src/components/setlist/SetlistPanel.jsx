@@ -1,5 +1,5 @@
-import { songs } from '../../data/dashboardData'
 import { Icon } from '../ui/Icon'
+import './setlists.css'
 
 export function SetlistPanel() {
   return (
@@ -7,17 +7,17 @@ export function SetlistPanel() {
       <div className="setlist-header">
         <div>
           <p className="eyebrow">Setlist activa</p>
-          <h1>En Vivo - Bar Central</h1>
+          <h1>Sin setlist activa</h1>
           <p className="setlist-location">
             <Icon type="pin" />
-            Ocotlan Oaxaca 11 Julio de 2026
+            Crea un setlist para iniciar una sesion
           </p>
         </div>
 
         <div className="setlist-actions-top">
           <div className="duration-badge">
             <span className="duration-label">Duracion total</span>
-            <strong>1h 45m</strong>
+            <strong>0m</strong>
           </div>
 
           <button className="start-button" type="button">
@@ -36,18 +36,13 @@ export function SetlistPanel() {
           <span>Duracion</span>
         </div>
 
-        {songs.map((song) => (
-          <div key={song.number} className={`songs-row${song.active ? ' active' : ''}`} role="row">
-            <span className="songs-cell songs-index" data-label="#">{song.number}</span>
-            <span className="song-title songs-cell songs-title-cell" data-label="Titulo">
-              {song.active ? <span className="row-play">▸</span> : null}
-              {song.title}
-            </span>
-            <span className="song-key songs-cell" data-label="Tono">{song.key}</span>
-            <span className="songs-cell" data-label="BPM">{song.bpm}</span>
-            <span className="songs-cell" data-label="Duracion">{song.duration}</span>
-          </div>
-        ))}
+        <div className="songs-row" role="row">
+          <span className="songs-cell songs-index" data-label="#">-</span>
+          <span className="song-title songs-cell songs-title-cell" data-label="Titulo">No hay canciones agregadas</span>
+          <span className="song-key songs-cell" data-label="Tono">-</span>
+          <span className="songs-cell" data-label="BPM">-</span>
+          <span className="songs-cell" data-label="Duracion">-</span>
+        </div>
       </div>
 
       <div className="panel-actions">

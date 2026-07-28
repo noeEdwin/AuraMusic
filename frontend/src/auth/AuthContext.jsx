@@ -68,7 +68,6 @@ export function AuthProvider({ children }) {
   async function register(payload) {
     clearAuthFeedback()
     const { data } = await api.post('/api/auth/register', payload)
-    setSession(data)
     return data
   }
 

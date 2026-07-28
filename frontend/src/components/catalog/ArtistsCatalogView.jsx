@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '../../lib/api'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import { CatalogPagination } from './CatalogPagination'
+import './catalog.css'
 
 const PAGE_SIZE = 6
 
