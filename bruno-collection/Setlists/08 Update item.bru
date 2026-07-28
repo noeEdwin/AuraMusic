@@ -1,0 +1,24 @@
+meta {
+  name: Update item
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}/items/{{itemId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "transposeSteps": 2,
+    "breakSeconds": 45,
+    "notes": "Tono actualizado para la banda"
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Delete band
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/bands/{{bandId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

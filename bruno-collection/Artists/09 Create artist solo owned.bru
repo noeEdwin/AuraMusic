@@ -1,0 +1,28 @@
+meta {
+  name: Create artist solo owned
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/artists
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{soloToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Solo Artist",
+    "bio": "Artista propio creado por SOLO"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("soloArtistId", data.id);
+}

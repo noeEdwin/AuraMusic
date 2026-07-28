@@ -1,11 +1,11 @@
 meta {
-  name: Add member
+  name: Create artist musician owned
   type: http
   seq: 3
 }
 
 post {
-  url: {{baseUrl}}/api/bands/{{bandId}}/members
+  url: {{baseUrl}}/api/artists
   body: json
   auth: none
 }
@@ -17,12 +17,12 @@ headers {
 
 body:json {
   {
-    "userEmail": "diego.ui@auramusic.local",
-    "instrument": "Bateria"
+    "name": "Bruno Musician Artist",
+    "bio": "Artista propio creado por MUSICIAN"
   }
 }
 
 script:post-response {
   const data = res.getBody();
-  bru.setVar("memberId", data.id);
+  bru.setVar("artistId", data.id);
 }

@@ -1,0 +1,15 @@
+meta {
+  name: Remove member
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/bands/{{bandId}}/members/{{memberId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

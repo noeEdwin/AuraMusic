@@ -1,0 +1,23 @@
+meta {
+  name: Artist ownership forbidden
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/artists/1
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Global Artist Should Stay Protected",
+    "bio": "Debe devolver 403"
+  }
+}

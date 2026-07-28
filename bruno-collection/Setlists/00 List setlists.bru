@@ -1,0 +1,15 @@
+meta {
+  name: List setlists
+  type: http
+  seq: 0
+}
+
+get {
+  url: {{baseUrl}}/api/setlists
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

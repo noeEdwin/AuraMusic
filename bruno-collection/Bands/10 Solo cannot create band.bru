@@ -1,0 +1,24 @@
+meta {
+  name: Solo cannot create band
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/bands
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{soloToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Solo Forbidden Band",
+    "description": "Debe devolver 403",
+    "instrument": "Voz"
+  }
+}

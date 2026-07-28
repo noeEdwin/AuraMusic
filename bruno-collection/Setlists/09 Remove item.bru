@@ -1,0 +1,15 @@
+meta {
+  name: Remove item
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}/items/{{itemId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

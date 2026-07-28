@@ -1,0 +1,24 @@
+meta {
+  name: Update setlist
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Setlist Updated",
+    "description": "Setlist actualizado",
+    "eventDate": "2026-07-29"
+  }
+}

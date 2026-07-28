@@ -1,0 +1,35 @@
+meta {
+  name: Create owned song
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/songs
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "artistId": {{artistId}},
+    "album": "Bruno Collection",
+    "title": "Cancion Propia Bruno",
+    "lyrics": "[VERSO]\n[C]Cancion propia",
+    "durationSeconds": 180,
+    "genre": "Pop",
+    "originalKey": "C",
+    "bpm": 100,
+    "explicitContent": false
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("ownedSongId", data.id);
+}

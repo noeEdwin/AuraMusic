@@ -1,0 +1,23 @@
+meta {
+  name: Join band
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/bands/join
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{soloToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "inviteCode": "{{inviteCode}}",
+    "instrument": "Teclado"
+  }
+}

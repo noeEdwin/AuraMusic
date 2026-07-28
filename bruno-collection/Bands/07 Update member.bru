@@ -1,0 +1,22 @@
+meta {
+  name: Update member
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/api/bands/{{bandId}}/members/{{memberId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "instrument": "Bateria electronica"
+  }
+}
