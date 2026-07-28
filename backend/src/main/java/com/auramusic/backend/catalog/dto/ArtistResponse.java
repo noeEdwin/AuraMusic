@@ -6,14 +6,16 @@ public record ArtistResponse(
         Long id,
         String name,
         String bio,
-        String imageUrl
+        String imageUrl,
+        UserSummary owner
 ) {
     public static ArtistResponse from(Artist artist) {
         return new ArtistResponse(
                 artist.getId(),
                 artist.getName(),
                 artist.getBio(),
-                artist.getImageUrl()
+                artist.getImageUrl(),
+                UserSummary.from(artist.getOwner())
         );
     }
 }

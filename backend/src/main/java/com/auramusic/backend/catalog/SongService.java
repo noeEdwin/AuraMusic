@@ -76,7 +76,7 @@ public class SongService {
     @Transactional
     public SongResponse create(CreateSongRequest request, String email) {
         User owner = findUser(email);
-        Artist artist = findArtist(request.artistId());
+        Artist artist = findArtist(request.artistId(), owner);
 
         Song song = new Song();
         song.setArtist(artist);
@@ -90,7 +90,7 @@ public class SongService {
         User user = findUser(email);
         Song song = findSong(id);
         assertCanModify(song, user);
-        Artist artist = findArtist(request.artistId());
+        Artist artist = findArtist(request.artistId(), user);
 
         song.setArtist(artist);
         apply(song, request);
@@ -143,9 +143,13 @@ public class SongService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cancion no encontrada"));
     }
 
-    private Artist findArtist(Long id) {
-        return artistRepository.findById(id)
+    private Artist findArtist(Long id, User user) {
+        Artist artist = artistRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artista no encontrado"));
+        if (isAdmin(user) || artist.getOwner() == null || artist.getOwner().getId().equals(user.getId())) {
+            return artist;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes usar un artista que pertenece a otro usuario");
     }
 
     private User findUser(String email) {

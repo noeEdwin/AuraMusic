@@ -15,7 +15,8 @@ export function RegisterView() {
   const { authFeedback, clearAuthFeedback, register } = useAuth()
   const [values, setValues] = useState({
     fullName: '',
-    phone: '',
+    phone: '+52',
+    role: 'MUSICIAN',
     email: '',
     password: '',
   })
@@ -35,7 +36,7 @@ export function RegisterView() {
 
     setValues((current) => ({
       ...current,
-      [name]: name === 'phone' ? value.replace(/\D/g, '') : value,
+      [name]: name === 'phone' ? normalizeMexicanPhone(value) : value,
     }))
     clearAuthFeedback()
     setSubmitError('')
@@ -51,6 +52,7 @@ export function RegisterView() {
     const nextTouchedFields = {
       fullName: true,
       phone: true,
+      role: true,
       email: true,
       password: true,
     }
@@ -70,7 +72,7 @@ export function RegisterView() {
         phone: values.phone.trim(),
         email: values.email.trim().toLowerCase(),
         password: values.password,
-        role: 'MUSICIAN',
+         role: values.role,
       })
       navigate(session.user.role === 'ADMIN' ? '/admin' : '/dashboard', { replace: true })
     } catch (error) {
@@ -118,9 +120,25 @@ export function RegisterView() {
           name="phone"
           onBlur={handleBlur}
           onChange={handleChange}
-          placeholder="9518695421"
-          value={values.phone}
-        />
+           placeholder="+529518695421"
+           value={values.phone}
+         />
+        <label className="auth-field">
+          <span className="auth-field-label">Tipo de cuenta</span>
+          <select
+            aria-describedby={getFieldError('role') ? 'role-error' : undefined}
+            aria-invalid={Boolean(getFieldError('role'))}
+            className={`auth-role-select${getFieldError('role') ? ' is-invalid' : ''}`}
+            name="role"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.role}
+          >
+            <option value="MUSICIAN">Musico de banda</option>
+            <option value="SOLO">Musico solista</option>
+          </select>
+          {getFieldError('role') ? <span className="auth-field-error" id="role-error">{getFieldError('role')}</span> : null}
+        </label>
         <AuthField
           autoComplete="email"
           error={getFieldError('email')}
@@ -177,4 +195,10 @@ function buildUsername(fullName) {
     .split(/\s+/)
     .filter(Boolean)
     .join('.')
+}
+
+function normalizeMexicanPhone(value) {
+  const digits = value.replace(/\D/g, '')
+  const nationalNumber = digits.startsWith('52') ? digits.slice(2, 12) : digits.slice(0, 10)
+  return `+52${nationalNumber}`
 }

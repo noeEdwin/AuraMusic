@@ -24,7 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "http://localhost:5173",
                         "http://auramusic.lat",
                         "https://auramusic.lat",
-                        "http://142.93.14.114",
+                        "http:z233//142.93.14.114",
                         "https://142.93.14.114"
                 );
     }

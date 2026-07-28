@@ -152,7 +152,7 @@ class CatalogIntegrationTests {
 
     @Test
     @WithMockUser(username = "musician@auramusic.local", roles = "MUSICIAN")
-    void nonAdminCannotCreateArtist() throws Exception {
+    void musicianCanCreateOwnedArtist() throws Exception {
         mockMvc.perform(post("/api/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -160,8 +160,9 @@ class CatalogIntegrationTests {
                                   "name": "Nuevo Artista"
                                 }
                                 """))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Solo un administrador puede modificar artistas"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Nuevo Artista"))
+                .andExpect(jsonPath("$.owner.username").value("musician"));
     }
 
     @Test

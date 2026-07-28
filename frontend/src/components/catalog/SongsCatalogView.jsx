@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { createArtist, createSong, deleteSong, fetchArtistsCatalog, fetchSongsCatalog } from '../../catalog/catalogApi'
+import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
 import { mockTeleprompterSongs } from '../../teleprompter/mockTeleprompterSongs'
 import { AppShellLayout } from '../layout/AppShellLayout'
@@ -27,6 +28,7 @@ const EMPTY_ARTIST_FORM = {
 }
 
 export function SongsCatalogView() {
+  const { role, user } = useAuth()
   const [filters, setFilters] = useState({ title: '', genre: '' })
   const [draftFilters, setDraftFilters] = useState({ title: '', genre: '' })
   const [page, setPage] = useState(0)
@@ -416,13 +418,13 @@ export function SongsCatalogView() {
                 <div className="catalog-cell" data-label="BPM">{song.bpm ?? 'N/D'}</div>
                 <div className="catalog-cell" data-label="Duracion">{formatDuration(song.durationSeconds)}</div>
                 <div className="catalog-cell catalog-actions-cell" data-label="Acciones">
-                  {typeof song.id === 'string' ? (
-                    <span className="catalog-local-tag">Demo</span>
-                  ) : (
-                    <button className="catalog-danger-button" type="button" onClick={() => handleDeleteSong(song)} disabled={deletingSongId === song.id}>
-                      {deletingSongId === song.id ? 'Eliminando...' : 'Eliminar'}
-                    </button>
-                  )}
+                   {typeof song.id === 'string' ? (
+                     <span className="catalog-local-tag">Demo</span>
+                   ) : canModifySong(song, role, user) ? (
+                     <button className="catalog-danger-button" type="button" onClick={() => handleDeleteSong(song)} disabled={deletingSongId === song.id}>
+                       {deletingSongId === song.id ? 'Eliminando...' : 'Eliminar'}
+                     </button>
+                   ) : <span className="catalog-local-tag">Solo lectura</span>}
                 </div>
               </article>
             ))}
@@ -439,6 +441,10 @@ export function SongsCatalogView() {
       </section>
     </AppShellLayout>
   )
+}
+
+function canModifySong(song, role, user) {
+  return role === 'ADMIN' || song.owner?.id === user?.id
 }
 
 function buildCreateSongPayload(form) {

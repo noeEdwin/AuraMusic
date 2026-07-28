@@ -55,11 +55,13 @@ class BandIntegrationTests {
         jdbcTemplate.update("DELETE FROM roles");
 
         jdbcTemplate.update("INSERT INTO roles (name, description, created_at) VALUES ('MUSICIAN', 'Musico', CURRENT_TIMESTAMP)");
+        jdbcTemplate.update("INSERT INTO roles (name, description, created_at) VALUES ('SOLO', 'Solista', CURRENT_TIMESTAMP)");
         Long roleId = roleRepository.findByName("MUSICIAN").orElseThrow().getId();
+        Long soloRoleId = roleRepository.findByName("SOLO").orElseThrow().getId();
 
         insertUser(roleId, "leader", "leader@auramusic.local");
         insertUser(roleId, "member", "member@auramusic.local");
-        insertUser(roleId, "outsider", "outsider@auramusic.local");
+        insertUser(soloRoleId, "outsider", "outsider@auramusic.local");
 
         Long leaderId = userRepository.findByEmail("leader@auramusic.local").orElseThrow().getId();
         jdbcTemplate.update("""
@@ -127,6 +129,21 @@ class BandIntegrationTests {
                                 {
                                   "name": "Cambio no permitido",
                                   "description": "No debe cambiarse"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "outsider@auramusic.local", roles = "SOLO")
+    void soloUserCannotCreateBand() throws Exception {
+        mockMvc.perform(post("/api/bands")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Banda no permitida",
+                                  "description": "No debe crearse",
+                                  "instrument": "Voz"
                                 }
                                 """))
                 .andExpect(status().isForbidden());

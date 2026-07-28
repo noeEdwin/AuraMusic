@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface ArtistRepository extends JpaRepository<Artist, Long>, JpaSpecificationExecutor<Artist> {
     Page<Artist> findByNameContainingIgnoreCase(String name, Pageable pageable);
     boolean existsByName(String name);
+    boolean existsByNameIgnoreCaseAndOwnerIsNull(String name);
+    boolean existsByNameIgnoreCaseAndOwnerId(String name, Long ownerId);
 }

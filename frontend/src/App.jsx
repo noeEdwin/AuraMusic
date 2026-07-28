@@ -12,6 +12,7 @@ import { PublicOnlyRoute } from './components/routing/PublicOnlyRoute'
 import { UnauthorizedView } from './components/shared/UnauthorizedView'
 import { TeleprompterView } from './components/teleprompter/TeleprompterView'
 import { SetlistsView } from './components/setlist/SetlistsView'
+import { BandsView } from './components/band/BandsView'
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <SetlistsView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/bands"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <BandsView />
           </ProtectedRoute>
         )}
       />

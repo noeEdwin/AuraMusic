@@ -4,6 +4,7 @@ export const navigationItems = [
   { label: 'Canciones', icon: 'note', path: '/songs' },
   { label: 'Artistas', icon: 'user', path: '/artists' },
   { label: 'SetLists', icon: 'list', path: '/setlists' },
+  { label: 'Bandas', icon: 'user', path: '/bands' },
   { label: 'Configuracion', icon: 'gear' },
 ]
 

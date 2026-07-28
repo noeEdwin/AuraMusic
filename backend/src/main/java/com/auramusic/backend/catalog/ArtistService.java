@@ -25,6 +25,8 @@ public class ArtistService {
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int MAX_PAGE_SIZE = 50;
     private static final String ADMIN = "ADMIN";
+    private static final String MUSICIAN = "MUSICIAN";
+    private static final String SOLO = "SOLO";
 
     private final ArtistRepository artistRepository;
     private final UserRepository userRepository;
@@ -53,13 +55,19 @@ public class ArtistService {
 
     @Transactional
     public ArtistResponse create(CreateArtistRequest request, String email) {
-        requireAdmin(email);
-        if (artistRepository.existsByName(request.name().trim())) {
+        User owner = findUser(email);
+        if (!isAdmin(owner) && !isMusicalUser(owner)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un musico o solista puede crear artistas");
+        }
+        String name = request.name().trim();
+        if (isAdmin(owner) ? artistRepository.existsByNameIgnoreCaseAndOwnerIsNull(name)
+                : artistRepository.existsByNameIgnoreCaseAndOwnerId(name, owner.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El artista ya esta registrado");
         }
 
         Artist artist = new Artist();
-        artist.setName(request.name().trim());
+        artist.setOwner(isAdmin(owner) ? null : owner);
+        artist.setName(name);
         artist.setBio(normalize(request.bio()));
         artist.setImageUrl(normalize(request.imageUrl()));
         return ArtistResponse.from(artistRepository.save(artist));
@@ -67,14 +75,17 @@ public class ArtistService {
 
     @Transactional
     public ArtistResponse update(Long id, UpdateArtistRequest request, String email) {
-        requireAdmin(email);
+        User user = findUser(email);
         Artist artist = findArtist(id);
-        if (!artist.getName().equalsIgnoreCase(request.name().trim())
-                && artistRepository.existsByName(request.name().trim())) {
+        assertCanModify(artist, user);
+        String name = request.name().trim();
+        if (!artist.getName().equalsIgnoreCase(name)
+                && (isAdmin(user) ? artistRepository.existsByNameIgnoreCaseAndOwnerIsNull(name)
+                : artistRepository.existsByNameIgnoreCaseAndOwnerId(name, user.getId()))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El artista ya esta registrado");
         }
 
-        artist.setName(request.name().trim());
+        artist.setName(name);
         artist.setBio(normalize(request.bio()));
         artist.setImageUrl(normalize(request.imageUrl()));
         return ArtistResponse.from(artistRepository.save(artist));
@@ -82,16 +93,31 @@ public class ArtistService {
 
     @Transactional
     public void delete(Long id, String email) {
-        requireAdmin(email);
-        artistRepository.delete(findArtist(id));
+        User user = findUser(email);
+        Artist artist = findArtist(id);
+        assertCanModify(artist, user);
+        artistRepository.delete(artist);
     }
 
-    private void requireAdmin(String email) {
-        User user = userRepository.findByEmail(email)
+    private User findUser(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado"));
-        if (user.getRole() == null || !Objects.equals(ADMIN, user.getRole().getName())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un administrador puede modificar artistas");
+    }
+
+    private void assertCanModify(Artist artist, User user) {
+        if (isAdmin(user) || (artist.getOwner() != null && artist.getOwner().getId().equals(user.getId()))) {
+            return;
         }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este artista");
+    }
+
+    private boolean isAdmin(User user) {
+        return user.getRole() != null && Objects.equals(ADMIN, user.getRole().getName());
+    }
+
+    private boolean isMusicalUser(User user) {
+        return user.getRole() != null && (Objects.equals(MUSICIAN, user.getRole().getName())
+                || Objects.equals(SOLO, user.getRole().getName()));
     }
 
     private Artist findArtist(Long id) {

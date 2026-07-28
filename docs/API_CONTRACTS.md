@@ -68,6 +68,7 @@ Inicia sesion con correo y contrasena.
     "id": 1,
     "username": "admin.noe",
     "email": "admin@auramusic.local",
+    "phone": "+529518695400",
     "displayName": "Noe Admin",
     "avatarUrl": "https://images.auramusic.local/avatars/admin-noe.png",
     "role": "ADMIN"
@@ -87,6 +88,7 @@ No se permite registrar `ADMIN` desde este endpoint.
 {
   "username": "nuevo.musico",
   "email": "nuevo@auramusic.local",
+  "phone": "+529518695421",
   "password": "AuraMusic1!",
   "displayName": "Nuevo Musico",
   "role": "MUSICIAN"
@@ -113,6 +115,7 @@ Al menos un caracter especial
     "id": 13,
     "username": "nuevo.musico",
     "email": "nuevo@auramusic.local",
+    "phone": "+529518695421",
     "displayName": "Nuevo Musico",
     "avatarUrl": null,
     "role": "MUSICIAN"
@@ -137,6 +140,7 @@ Authorization: Bearer <TOKEN>
   "id": 1,
   "username": "admin.noe",
   "email": "admin@auramusic.local",
+  "phone": null,
   "displayName": "Noe Admin",
   "avatarUrl": "https://images.auramusic.local/avatars/admin-noe.png",
   "role": "ADMIN"

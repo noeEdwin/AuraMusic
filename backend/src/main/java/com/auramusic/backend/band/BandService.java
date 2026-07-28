@@ -26,6 +26,7 @@ public class BandService {
     private static final String ADMIN = "ADMIN";
     private static final String LEADER = "LEADER";
     private static final String MEMBER = "MEMBER";
+    private static final String MUSICIAN = "MUSICIAN";
 
     private final BandRepository bandRepository;
     private final BandMemberRepository bandMemberRepository;
@@ -69,6 +70,9 @@ public class BandService {
     @Transactional
     public BandResponse create(CreateBandRequest request, String email) {
         User leader = findUser(email);
+        if (!isAdmin(leader) && (leader.getRole() == null || !MUSICIAN.equals(leader.getRole().getName()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un musico puede crear una banda");
+        }
         Band band = new Band();
         band.setLeader(leader);
         band.setName(request.name().trim());

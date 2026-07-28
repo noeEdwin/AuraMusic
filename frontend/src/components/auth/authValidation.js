@@ -1,6 +1,6 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
-const phonePattern = /^\d{10}$/
+const phonePattern = /^\+52\d{10}$/
 const namePattern = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/
 
 export function validateLogin(values) {
@@ -33,7 +33,11 @@ export function validateRegister(values) {
   if (!values.phone.trim()) {
     errors.phone = 'Ingresa tu telefono.'
   } else if (!phonePattern.test(values.phone)) {
-    errors.phone = 'Ingresa un telefono de 10 digitos.'
+    errors.phone = 'Usa formato +52 y diez digitos, por ejemplo +529518695421.'
+  }
+
+  if (!values.role) {
+    errors.role = 'Selecciona el tipo de cuenta.'
   }
 
   if (!values.email.trim()) {
