@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import { useAuth } from '../../auth/useAuth'
 import { fetchSongsCatalog, updateSong } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { createLiveSessionClient } from '../../live/liveSessionClient'
+import { fetchSetlist } from '../../setlists/setlistsApi'
 import { parseTeleprompterSections } from '../../teleprompter/teleprompterParser'
 import { mockTeleprompterSongs } from '../../teleprompter/mockTeleprompterSongs'
 import { AppShellLayout } from '../layout/AppShellLayout'
@@ -10,12 +13,19 @@ import { StatusBanner } from '../shared/StatusBanner'
 import { Icon } from '../ui/Icon'
 
 const TELEPROMPTER_PAGE_SIZE = 20
+const AUTO_SCROLL_PIXELS_PER_SECOND = 42
 
 export function TeleprompterView() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { token } = useAuth()
   const scrollAreaRef = useRef(null)
+  const liveClientRef = useRef(null)
   const [songs, setSongs] = useState([])
+  const [liveSetlist, setLiveSetlist] = useState(null)
+  const [liveSessionState, setLiveSessionState] = useState(null)
+  const [liveConnectionState, setLiveConnectionState] = useState('local')
+  const [liveError, setLiveError] = useState('')
   const [selectedSongId, setSelectedSongId] = useState('')
   const [transposeSteps, setTransposeSteps] = useState(0)
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false)
@@ -28,6 +38,13 @@ export function TeleprompterView() {
   const [fontSizeScale, setFontSizeScale] = useState(1)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const bandId = searchParams.get('bandId')
+  const setlistId = searchParams.get('setlistId')
+  const requestedItemId = searchParams.get('itemId')
+  const liveMemberRole = searchParams.get('memberRole')
+  const shouldStartSession = searchParams.get('startSession') === 'true'
+  const isLiveMode = Boolean(bandId && setlistId)
+  const canControlLiveSession = liveMemberRole === 'LEADER'
 
   useEffect(() => {
     let ignore = false
@@ -37,14 +54,20 @@ export function TeleprompterView() {
       setError('')
 
       try {
-        const data = await fetchSongsCatalog({ page: 0, size: TELEPROMPTER_PAGE_SIZE })
-        const songsWithLyrics = [
+        const [data, requestedSetlist] = await Promise.all([
+          fetchSongsCatalog({ page: 0, size: TELEPROMPTER_PAGE_SIZE }),
+          setlistId ? fetchSetlist(setlistId) : Promise.resolve(null),
+        ])
+        const candidateSongs = [
           ...mockTeleprompterSongs,
+          ...(requestedSetlist?.items ?? []).map((item) => item.song).filter(Boolean),
           ...(data.content ?? []).filter((song) => song.lyrics),
         ]
+        const songsWithLyrics = [...new Map(candidateSongs.map((song) => [String(song.id), song])).values()]
 
         if (!ignore) {
           setSongs(songsWithLyrics)
+          setLiveSetlist(requestedSetlist)
           setSelectedSongId((current) => {
             const requestedSongId = searchParams.get('songId')
 
@@ -77,7 +100,7 @@ export function TeleprompterView() {
     return () => {
       ignore = true
     }
-  }, [searchParams])
+  }, [searchParams, setlistId])
 
   useEffect(() => {
     const requestedSongId = searchParams.get('songId')
@@ -99,7 +122,61 @@ export function TeleprompterView() {
   )
 
   useEffect(() => {
-    setIsAutoScrollEnabled(false)
+    if (!isLiveMode || !token || !liveSetlist) {
+      liveClientRef.current = null
+      setLiveConnectionState('local')
+      setLiveSessionState(null)
+      return undefined
+    }
+
+    let disposed = false
+    let sentInitialCommand = false
+    const client = createLiveSessionClient({
+      bandId,
+      token,
+      onConnectionChange: (connectionState) => {
+        if (disposed) return
+        setLiveConnectionState(connectionState)
+
+        if (connectionState === 'connected') {
+          setLiveError('')
+          const command = !sentInitialCommand && shouldStartSession
+            ? {
+                type: 'START_SESSION',
+                setlistId: Number(setlistId),
+                activeItemId: Number(requestedItemId),
+              }
+            : { type: 'SYNC_REQUEST' }
+          sentInitialCommand = true
+          client.publish(command)
+        }
+      },
+      onError: (message) => {
+        if (!disposed) setLiveError(message)
+      },
+      onState: (state) => {
+        if (disposed) return
+
+        setLiveSessionState(state)
+        setIsAutoScrollEnabled(Boolean(state.active && state.playing))
+
+        const activeItem = liveSetlist.items?.find((item) => String(item.id) === String(state.activeItemId))
+        if (activeItem?.song?.id) setSelectedSongId(String(activeItem.song.id))
+      },
+    })
+
+    liveClientRef.current = client
+    client.connect()
+
+    return () => {
+      disposed = true
+      if (liveClientRef.current === client) liveClientRef.current = null
+      void client.disconnect()
+    }
+  }, [bandId, isLiveMode, liveSetlist, requestedItemId, setlistId, shouldStartSession, token])
+
+  useEffect(() => {
+    if (!isLiveMode) setIsAutoScrollEnabled(false)
     setIsControlsOpen(false)
     setIsEditingLyrics(false)
     setLyricsDraft('')
@@ -108,7 +185,16 @@ export function TeleprompterView() {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = 0
     }
-  }, [selectedSongId])
+  }, [isLiveMode, selectedSongId])
+
+  useEffect(() => {
+    if (!isLiveMode || !liveSessionState?.active || !scrollAreaRef.current) return
+
+    const targetScrollTop = liveSessionState.positionSeconds * AUTO_SCROLL_PIXELS_PER_SECOND
+    if (Math.abs(scrollAreaRef.current.scrollTop - targetScrollTop) > 28) {
+      scrollAreaRef.current.scrollTop = targetScrollTop
+    }
+  }, [isLiveMode, liveSessionState?.active, liveSessionState?.activeItemId, liveSessionState?.positionSeconds, selectedSongId])
 
   useEffect(() => {
     if (!isAutoScrollEnabled || !scrollAreaRef.current) {
@@ -117,16 +203,23 @@ export function TeleprompterView() {
 
     const scrollElement = scrollAreaRef.current
     let frameId = 0
+    let previousTimestamp = null
 
-    function step() {
+    function step(timestamp) {
       const reachedBottom = scrollElement.scrollTop + scrollElement.clientHeight >= scrollElement.scrollHeight - 2
 
       if (reachedBottom) {
+        if (isLiveMode && !canControlLiveSession) return
         setIsAutoScrollEnabled(false)
+        if (isLiveMode) liveClientRef.current?.publish({ type: 'PAUSE' })
         return
       }
 
-      scrollElement.scrollTop += 0.7
+      if (previousTimestamp !== null) {
+        const elapsedMilliseconds = Math.min(timestamp - previousTimestamp, 50)
+        scrollElement.scrollTop += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedMilliseconds / 1000
+      }
+      previousTimestamp = timestamp
       frameId = window.requestAnimationFrame(step)
     }
 
@@ -135,7 +228,61 @@ export function TeleprompterView() {
     return () => {
       window.cancelAnimationFrame(frameId)
     }
-  }, [isAutoScrollEnabled])
+  }, [canControlLiveSession, isAutoScrollEnabled, isLiveMode, selectedSongId])
+
+  useEffect(() => {
+    if (!isLiveMode || !canControlLiveSession || liveConnectionState !== 'connected' || !liveSessionState?.active || !isAutoScrollEnabled) {
+      return undefined
+    }
+
+    const intervalId = window.setInterval(() => {
+      publishCurrentLivePosition()
+    }, 2000)
+
+    return () => window.clearInterval(intervalId)
+  }, [canControlLiveSession, isAutoScrollEnabled, isLiveMode, liveConnectionState, liveSessionState?.active])
+
+  function togglePlayback() {
+    if (!isLiveMode) {
+      setIsAutoScrollEnabled((current) => !current)
+      return
+    }
+
+    if (liveConnectionState !== 'connected') {
+      setLiveError('Espera a que la sesion en vivo termine de conectar.')
+      return
+    }
+
+    publishCurrentLivePosition()
+    const sent = liveClientRef.current?.publish({ type: isAutoScrollEnabled ? 'PAUSE' : 'PLAY' })
+    if (!sent) setLiveError('No fue posible enviar el control a la sesion en vivo.')
+  }
+
+  function publishCurrentLivePosition() {
+    if (!scrollAreaRef.current) return false
+
+    return liveClientRef.current?.publish({
+      type: 'SEEK',
+      positionSeconds: Math.max(0, Math.round(scrollAreaRef.current.scrollTop / AUTO_SCROLL_PIXELS_PER_SECOND)),
+    }) ?? false
+  }
+
+  function changeLiveSong(offset) {
+    if (!canControlLiveSession || !liveSessionState?.active) return
+
+    const items = liveSetlist?.items ?? []
+    const activeIndex = items.findIndex((item) => String(item.id) === String(liveSessionState.activeItemId))
+    const targetItem = items[activeIndex + offset]
+    if (!targetItem) return
+
+    const sent = liveClientRef.current?.publish({ type: 'CHANGE_SONG', activeItemId: targetItem.id })
+    if (!sent) setLiveError('No fue posible cambiar la cancion activa.')
+  }
+
+  function closeLiveSession() {
+    const sent = liveClientRef.current?.publish({ type: 'CLOSE_SESSION' })
+    if (!sent) setLiveError('No fue posible cerrar la sesion en vivo.')
+  }
 
   function decreaseFontSize() {
     setFontSizeScale((current) => Math.max(0.8, Number((current - 0.1).toFixed(2))))
@@ -239,6 +386,7 @@ export function TeleprompterView() {
           <StatusBanner message={error} tone="error" />
           <StatusBanner message={saveMessage} tone="info" />
           <StatusBanner message={saveError} tone="error" />
+          <StatusBanner message={liveError} tone="error" />
 
           {isEditingLyrics && selectedSong ? (
             <section className="teleprompter-editor" aria-label="Editor de letra y acordes">
@@ -286,6 +434,9 @@ export function TeleprompterView() {
                 <div className="teleprompter-meta-pills">
                   <span>{selectedSong.genre ?? 'Sin genero'}</span>
                   <span>{selectedSong.bpm ?? 'N/D'} BPM</span>
+                  <span className={`teleprompter-live-pill ${liveConnectionState}`}>
+                    {isLiveMode ? getLiveConnectionLabel(liveConnectionState, liveSessionState) : 'Modo local'}
+                  </span>
                 </div>
               </header>
 
@@ -320,9 +471,18 @@ export function TeleprompterView() {
         </div>
 
         <footer className="teleprompter-footer">
-          <button className="teleprompter-play-button" type="button" onClick={() => setIsAutoScrollEnabled((current) => !current)}>
-            <Icon type={isAutoScrollEnabled ? 'pause' : 'play'} />
-          </button>
+          <div className="teleprompter-play-controls">
+            {isLiveMode && canControlLiveSession ? <button className="teleprompter-skip-button" type="button" aria-label="Cancion anterior" onClick={() => changeLiveSong(-1)} disabled={!getAdjacentLiveItem(liveSetlist, liveSessionState, -1)}><Icon type="chevronLeft" /></button> : null}
+            <button
+              className="teleprompter-play-button"
+              type="button"
+              onClick={togglePlayback}
+              disabled={isLiveMode && (liveConnectionState !== 'connected' || !liveSessionState?.active || !canControlLiveSession)}
+            >
+              <Icon type={isAutoScrollEnabled ? 'pause' : 'play'} />
+            </button>
+            {isLiveMode && canControlLiveSession ? <button className="teleprompter-skip-button" type="button" aria-label="Cancion siguiente" onClick={() => changeLiveSong(1)} disabled={!getAdjacentLiveItem(liveSetlist, liveSessionState, 1)}><Icon type="chevronRight" /></button> : null}
+          </div>
 
           <div className="teleprompter-footer-group">
             <span className="teleprompter-footer-label">Auto-scroll</span>
@@ -335,11 +495,13 @@ export function TeleprompterView() {
           </div>
 
           <div className="teleprompter-footer-group teleprompter-sync-box">
-            <strong>Sincronizado</strong>
+            <strong>{isLiveMode ? getLiveConnectionLabel(liveConnectionState, liveSessionState) : 'Modo local'}</strong>
             <span className="teleprompter-footer-label">
-              {selectedSong?.artist?.name ?? 'Catalogo local'}
+              {isLiveMode ? liveSetlist?.name ?? 'Setlist de banda' : 'Sesion personal'}
             </span>
           </div>
+
+          {isLiveMode && canControlLiveSession ? <button className="teleprompter-close-live-button" type="button" onClick={closeLiveSession} disabled={!liveSessionState?.active}>Cerrar sesion</button> : null}
         </footer>
       </section>
     </AppShellLayout>
@@ -372,4 +534,18 @@ function getDisplayKey(song, transposeSteps) {
   const transposedKey = transposedSong[0]?.lines[0]?.segments[0]?.chord
 
   return transposedKey ?? song.originalKey
+}
+
+function getLiveConnectionLabel(connectionState, sessionState) {
+  if (connectionState === 'connecting') return 'Conectando'
+  if (connectionState === 'error') return 'Error de conexion'
+  if (connectionState !== 'connected') return 'Desconectado'
+  if (!sessionState?.active) return 'Sesion inactiva'
+  return 'En vivo'
+}
+
+function getAdjacentLiveItem(setlist, sessionState, offset) {
+  const items = setlist?.items ?? []
+  const activeIndex = items.findIndex((item) => String(item.id) === String(sessionState?.activeItemId))
+  return activeIndex < 0 ? null : items[activeIndex + offset] ?? null
 }

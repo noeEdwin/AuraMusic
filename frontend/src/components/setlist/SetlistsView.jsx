@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
+import { useAuth } from '../../auth/useAuth'
+import { fetchBands } from '../../bands/bandsApi'
 import { fetchSongsCatalog } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
 import {
@@ -25,11 +27,13 @@ export function SetlistsView() {
 
 function SetlistsListView() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [setlists, setSetlists] = useState([])
+  const [bands, setBands] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [draft, setDraft] = useState({ name: '', description: '', eventDate: '' })
+  const [draft, setDraft] = useState({ name: '', description: '', eventDate: '', bandId: '' })
   const [deletingId, setDeletingId] = useState(null)
   const [pendingDelete, setPendingDelete] = useState(null)
 
@@ -39,8 +43,11 @@ function SetlistsListView() {
     async function load() {
       setIsLoading(true)
       try {
-        const data = await fetchSetlists()
-        if (!ignore) setSetlists(data)
+        const [setlistsData, bandsData] = await Promise.all([fetchSetlists(), fetchBands()])
+        if (!ignore) {
+          setSetlists(setlistsData)
+          setBands(bandsData.filter((band) => band.members?.some((member) => member.user?.id === user?.id)))
+        }
       } catch (requestError) {
         if (!ignore) setError(getApiErrorMessage(requestError, 'No fue posible cargar los setlists.'))
       } finally {
@@ -50,7 +57,7 @@ function SetlistsListView() {
 
     void load()
     return () => { ignore = true }
-  }, [])
+  }, [user?.id])
 
   function handleDraftChange(event) {
     const { name, value } = event.target
@@ -61,7 +68,11 @@ function SetlistsListView() {
     event.preventDefault()
     setError('')
     try {
-      const created = await createSetlist({ ...draft, eventDate: draft.eventDate || null, bandId: null })
+      const created = await createSetlist({
+        ...draft,
+        eventDate: draft.eventDate || null,
+        bandId: draft.bandId ? Number(draft.bandId) : null,
+      })
       navigate(`/setlists/${created.id}`)
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, 'No fue posible crear el setlist.'))
@@ -108,6 +119,7 @@ function SetlistsListView() {
             <div className="catalog-filter-grid">
               <label className="catalog-field"><span>Nombre</span><input name="name" value={draft.name} onChange={handleDraftChange} required maxLength={140} placeholder="Tour 2026 - Bar Sevilla" /></label>
               <label className="catalog-field"><span>Fecha del evento</span><input name="eventDate" value={draft.eventDate} onChange={handleDraftChange} type="date" /></label>
+              <label className="catalog-field"><span>Tipo de repertorio</span><select name="bandId" value={draft.bandId} onChange={handleDraftChange}><option value="">Personal / solista</option>{bands.map((band) => <option key={band.id} value={band.id}>{band.name}</option>)}</select></label>
               <label className="catalog-field setlist-description-field"><span>Descripcion</span><input name="description" value={draft.description} onChange={handleDraftChange} maxLength={255} placeholder="Repertorio para presentacion en vivo" /></label>
             </div>
             <div className="song-editor-actions"><button className="catalog-clear" type="button" onClick={() => setIsCreateOpen(false)}>Cancelar</button><button className="catalog-submit" type="submit">Guardar</button></div>
@@ -122,7 +134,7 @@ function SetlistsListView() {
             {setlists.map((setlist) => (
               <article className="setlist-summary-row" key={setlist.id}>
                 <Link to={`/setlists/${setlist.id}`} className="setlist-summary-link">
-                  <span className="page-panel-badge">{setlist.items?.length ?? 0} canciones</span>
+                  <span className="page-panel-badge">{setlist.bandId ? 'Banda' : 'Solo'} · {setlist.items?.length ?? 0} canciones</span>
                   <h2>{setlist.name}</h2>
                   <p>{setlist.description || 'Sin descripcion'}</p>
                   <span className="setlist-summary-date">{formatDate(setlist.eventDate)}</span>
@@ -144,7 +156,9 @@ function SetlistsListView() {
 
 function SetlistBuilderView({ setlistId }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [setlist, setSetlist] = useState(null)
+  const [bandMemberRole, setBandMemberRole] = useState(null)
   const [songs, setSongs] = useState([])
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -159,11 +173,18 @@ function SetlistBuilderView({ setlistId }) {
     async function load() {
       setIsLoading(true)
       try {
-        const [setlistData, songsData] = await Promise.all([fetchSetlist(setlistId), fetchSongsCatalog({ page: 0, size: 50 })])
+        const [setlistData, songsData, bandsData] = await Promise.all([
+          fetchSetlist(setlistId),
+          fetchSongsCatalog({ page: 0, size: 50 }),
+          fetchBands(),
+        ])
         if (!ignore) {
           setSetlist(setlistData)
           setDraft({ name: setlistData.name, description: setlistData.description ?? '', eventDate: setlistData.eventDate ?? '' })
           setSongs(songsData.content ?? [])
+          const band = bandsData.find((item) => item.id === setlistData.bandId)
+          const membership = band?.members?.find((member) => member.user?.id === user?.id)
+          setBandMemberRole(membership?.memberRole ?? null)
         }
       } catch (requestError) {
         if (!ignore) setError(getApiErrorMessage(requestError, 'No fue posible cargar el setlist.'))
@@ -173,14 +194,14 @@ function SetlistBuilderView({ setlistId }) {
     }
     void load()
     return () => { ignore = true }
-  }, [setlistId])
+  }, [setlistId, user?.id])
 
   const availableSongs = useMemo(() => {
     const itemSongIds = new Set((setlist?.items ?? []).map((item) => item.song?.id))
     return songs.filter((song) => !itemSongIds.has(song.id) && song.title.toLowerCase().includes(search.toLowerCase()))
   }, [search, setlist, songs])
 
-  const firstSongId = setlist?.items?.[0]?.song?.id
+  const firstItem = setlist?.items?.[0]
 
   function handleDraftChange(event) {
     const { name, value } = event.target
@@ -235,15 +256,28 @@ function SetlistBuilderView({ setlistId }) {
     }
   }
 
-  function openTeleprompter(songId) {
-    if (!songId) return
-    navigate(`/teleprompter?songId=${songId}`)
+  function openTeleprompter(item, startSession = false) {
+    if (!item?.song?.id) return
+
+    const params = new URLSearchParams({
+      songId: String(item.song.id),
+      setlistId: String(setlist.id),
+      itemId: String(item.id),
+    })
+
+    if (setlist.bandId && bandMemberRole) {
+      params.set('bandId', String(setlist.bandId))
+      params.set('memberRole', bandMemberRole)
+      if (startSession) params.set('startSession', 'true')
+    }
+
+    navigate(`/teleprompter?${params}`)
   }
 
-  function handleSongKeyDown(event, songId) {
+  function handleSongKeyDown(event, item) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      openTeleprompter(songId)
+      openTeleprompter(item)
     }
   }
 
@@ -263,8 +297,8 @@ function SetlistBuilderView({ setlistId }) {
         <div className="builder-heading">
           <div><h1>{setlist.name}</h1><p>{setlist.description || 'Sin descripcion'}{setlist.eventDate ? ` · ${formatDate(setlist.eventDate)}` : ''}</p></div>
           <div className="builder-heading-actions">
-            <button className="catalog-submit builder-play-button" type="button" onClick={() => openTeleprompter(firstSongId)} disabled={!firstSongId}>
-              <Icon type="play" /> Iniciar
+            <button className="catalog-submit builder-play-button" type="button" onClick={() => openTeleprompter(firstItem, bandMemberRole === 'LEADER')} disabled={!firstItem?.song?.id}>
+              <Icon type="play" /> {getSetlistStartLabel(setlist.bandId, bandMemberRole)}
             </button>
             {isEditingDetails ? (
               <button className="catalog-submit" type="submit" form="setlist-details-form" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar cambios'}</button>
@@ -286,7 +320,7 @@ function SetlistBuilderView({ setlistId }) {
 
             <div className="builder-song-list">
               {setlist.items?.map((item, index) => (
-                <article key={item.id} className="builder-song-item" draggable role="button" tabIndex={0} onClick={() => openTeleprompter(item.song?.id)} onKeyDown={(event) => handleSongKeyDown(event, item.song?.id)} onDragStart={() => setDraggedItemId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => dropItem(item.id)}>
+                <article key={item.id} className="builder-song-item" draggable role="button" tabIndex={0} onClick={() => openTeleprompter(item)} onKeyDown={(event) => handleSongKeyDown(event, item)} onDragStart={() => setDraggedItemId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => dropItem(item.id)}>
                   <span className="builder-drag-handle">⠿</span><span className="builder-song-number">{String(index + 1).padStart(2, '0')}</span>
                   <div className="builder-song-copy"><strong>{item.song?.title}</strong><span>{item.song?.artist?.name ?? 'Artista sin asignar'}</span></div>
                   <span className="catalog-pill">{item.song?.originalKey ?? 'N/D'}</span><span className="builder-song-bpm">{item.song?.bpm ?? 'N/D'} BPM</span><span>{formatDuration(item.song?.durationSeconds)}</span>
@@ -326,4 +360,11 @@ function formatDuration(seconds) {
 function averageBpm(items = []) {
   const bpms = items.map((item) => item.song?.bpm).filter(Boolean)
   return bpms.length ? Math.round(bpms.reduce((sum, bpm) => sum + bpm, 0) / bpms.length) : 'N/D'
+}
+
+function getSetlistStartLabel(bandId, memberRole) {
+  if (!bandId) return 'Iniciar'
+  if (memberRole === 'LEADER') return 'Iniciar en vivo'
+  if (memberRole) return 'Unirse'
+  return 'Ver'
 }

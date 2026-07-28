@@ -11,6 +11,7 @@ import com.auramusic.backend.repository.UserRepository;
 import com.auramusic.backend.security.CustomUserDetailsService;
 import com.auramusic.backend.security.JwtService;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,14 +74,16 @@ class StompJwtInterceptorTests {
         when(revokedTokenRepository.existsByTokenHash("hash")).thenReturn(false);
         when(userDetailsService.loadUserByUsername(details.getUsername())).thenReturn(details);
 
-        Message<?> result = interceptor.preSend(connect("Bearer valid-token"), channel);
+        AtomicReference<java.security.Principal> sessionUser = new AtomicReference<>();
+        Message<?> result = interceptor.preSend(connect("Bearer valid-token", sessionUser), channel);
 
         assertNotNull(StompHeaderAccessor.wrap(result).getUser());
+        assertNotNull(sessionUser.get());
     }
 
     @Test
     void rejectsConnectWithoutJwt() {
-        assertThrows(MessagingException.class, () -> interceptor.preSend(connect(null), channel));
+        assertThrows(MessagingException.class, () -> interceptor.preSend(connect(null, new AtomicReference<>()), channel));
     }
 
     @Test
@@ -99,11 +102,13 @@ class StompJwtInterceptorTests {
         assertThrows(MessagingException.class, () -> interceptor.preSend(message, channel));
     }
 
-    private Message<byte[]> connect(String authorization) {
+    private Message<byte[]> connect(String authorization, AtomicReference<java.security.Principal> sessionUser) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
         if (authorization != null) {
             accessor.addNativeHeader(HttpHeaders.AUTHORIZATION, authorization);
         }
+        accessor.setUserChangeCallback(sessionUser::set);
+        accessor.setLeaveMutable(true);
         return MessageBuilder.createMessage(new byte[0], accessor.getMessageHeaders());
     }
 }

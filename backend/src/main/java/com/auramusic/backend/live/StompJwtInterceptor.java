@@ -15,7 +15,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,12 +49,14 @@ public class StompJwtInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor == null) {
+            return message;
+        }
         StompCommand command = accessor.getCommand();
 
         if (StompCommand.CONNECT.equals(command)) {
             accessor.setUser(authenticate(accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION)));
-            return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
         } else if (StompCommand.SUBSCRIBE.equals(command)) {
             requireBandMember(accessor.getUser(), accessor.getDestination());
         } else if (StompCommand.SEND.equals(command)) {
