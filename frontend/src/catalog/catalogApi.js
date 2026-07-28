@@ -26,3 +26,27 @@ export async function fetchArtistsCatalog({ page, size, name }) {
 
   return data
 }
+
+export async function createArtist(payload) {
+  const { data } = await api.post('/api/artists', payload)
+  return data
+}
+
+export async function createSong(payload) {
+  const { data } = await api.post('/api/songs', payload)
+  return data
+}
+
+export async function deleteSong(songId) {
+  await api.delete(`/api/songs/${songId}`)
+}
+
+export async function fetchSongById(songId) {
+  const { data } = await api.get(`/api/songs/${songId}`)
+  return data
+}
+
+export async function updateSong(songId, payload) {
+  const { data } = await api.put(`/api/songs/${songId}`, payload)
+  return data
+}

@@ -10,6 +10,7 @@ import { DashboardView } from './components/dashboard/DashboardView'
 import { ProtectedRoute } from './components/routing/ProtectedRoute'
 import { PublicOnlyRoute } from './components/routing/PublicOnlyRoute'
 import { UnauthorizedView } from './components/shared/UnauthorizedView'
+import { TeleprompterView } from './components/teleprompter/TeleprompterView'
 
 function App() {
   return (
@@ -52,6 +53,14 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <ArtistsCatalogView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/teleprompter"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <TeleprompterView />
           </ProtectedRoute>
         )}
       />

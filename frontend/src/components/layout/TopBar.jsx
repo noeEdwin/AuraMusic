@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { Icon } from '../ui/Icon'
 
-export function TopBar({ onMenuToggle }) {
+export function TopBar({ onMenuToggle, variant = 'default' }) {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -19,6 +19,7 @@ export function TopBar({ onMenuToggle }) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join('') || 'AM'
+  const isCompact = variant === 'compact'
 
   async function handleLogout() {
     setIsLoggingOut(true)
@@ -32,26 +33,28 @@ export function TopBar({ onMenuToggle }) {
   }
 
   return (
-    <header className="topbar">
+    <header className={`topbar${isCompact ? ' topbar-compact' : ''}`}>
       <button className="icon-button topbar-menu-button" type="button" aria-label="Abrir menu" onClick={onMenuToggle}>
         <Icon type="menu" />
       </button>
 
-      <label className="searchbar" htmlFor="quick-search">
-        <Icon type="search" />
-        <input id="quick-search" type="text" placeholder="Busca rapidamente canciones, listas de canciones o artistas..." />
-      </label>
+      {!isCompact ? (
+        <label className="searchbar" htmlFor="quick-search">
+          <Icon type="search" />
+          <input id="quick-search" type="text" placeholder="Busca rapidamente canciones, listas de canciones o artistas..." />
+        </label>
+      ) : null}
 
       <div className="topbar-meta">
         <div className="connection-pill">
           <span className="status-dot" />
-          <span>CONECTADO</span>
+          <span className="connection-label">CONECTADO</span>
         </div>
 
         <div className="role-pill">{role}</div>
 
         <div className="profile-chip">
-          <div>
+          <div className="profile-copy">
             <p className="profile-name">{displayName}</p>
             <p className="profile-email">{email}</p>
           </div>
@@ -60,7 +63,7 @@ export function TopBar({ onMenuToggle }) {
 
         <button className="logout-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
           <Icon type="logout" />
-          <span>{isLoggingOut ? 'Cerrando...' : 'Logout'}</span>
+          <span className="logout-label">{isLoggingOut ? 'Cerrando...' : 'Logout'}</span>
         </button>
       </div>
     </header>

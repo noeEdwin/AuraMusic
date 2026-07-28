@@ -50,6 +50,8 @@ export function Icon({ type }) {
         <path d="M4 17h16" />
       </>
     ),
+    chevronLeft: <path d="m15 18-6-6 6-6" />,
+    chevronDown: <path d="m6 9 6 6 6-6" />,
     mail: (
       <>
         <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5v9A1.5 1.5 0 0 1 18.5 18h-13A1.5 1.5 0 0 1 4 16.5Z" />
@@ -81,11 +83,18 @@ export function Icon({ type }) {
         <circle cx="12" cy="12" r="2.5" />
       </>
     ),
+    minus: <path d="M5 12h14" />,
     logout: (
       <>
         <path d="M9 20H6.5A1.5 1.5 0 0 1 5 18.5v-13A1.5 1.5 0 0 1 6.5 4H9" />
         <path d="M13 16l4-4-4-4" />
         <path d="M17 12H9" />
+      </>
+    ),
+    pause: (
+      <>
+        <path d="M9 7v10" />
+        <path d="M15 7v10" />
       </>
     ),
     play: <path d="M9 7.5v9l7-4.5-7-4.5Z" fill="currentColor" stroke="none" />,

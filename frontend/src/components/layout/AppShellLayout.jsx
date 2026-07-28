@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 
-export function AppShellLayout({ children, contentClassName = 'content-grid' }) {
+export function AppShellLayout({ children, contentClassName = 'content-grid', topBarVariant = 'compact' }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   function toggleSidebar() {
@@ -26,7 +26,7 @@ export function AppShellLayout({ children, contentClassName = 'content-grid' }) 
       <Sidebar isOpen={isSidebarOpen} onNavigate={closeSidebar} onToggle={toggleSidebar} />
 
       <div className="main-layout">
-        <TopBar onMenuToggle={toggleSidebar} />
+        <TopBar onMenuToggle={toggleSidebar} variant={topBarVariant} />
         <main className={contentClassName}>{children}</main>
       </div>
     </div>

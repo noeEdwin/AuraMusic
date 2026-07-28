@@ -1,8 +1,10 @@
 .app-shell {
   min-height: 100vh;
+  height: 100dvh;
   display: grid;
   grid-template-columns: 204px minmax(0, 1fr);
   position: relative;
+  overflow: hidden;
   background:
     radial-gradient(circle at top right, rgba(127, 90, 240, 0.16), transparent 26%),
     linear-gradient(180deg, #090b12 0%, #070910 100%);
@@ -13,12 +15,22 @@
 }
 
 .sidebar {
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   gap: 28px;
+  height: 100dvh;
+  max-height: 100dvh;
   padding: 20px 16px 14px;
   border-right: 1px solid rgba(185, 194, 255, 0.08);
   background: rgba(10, 13, 22, 0.88);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar-top {
@@ -117,7 +129,10 @@
 .main-layout {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  height: 100dvh;
   min-width: 0;
+  overflow: hidden;
 }
 
 .topbar {
@@ -125,10 +140,25 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  min-width: 0;
   padding: 14px 24px;
   border-bottom: 1px solid rgba(185, 194, 255, 0.08);
   background: rgba(9, 11, 18, 0.72);
   backdrop-filter: blur(18px);
+}
+
+.topbar-compact {
+  justify-content: flex-end;
+  min-height: 68px;
+}
+
+.topbar-compact .topbar-menu-button {
+  margin-right: auto;
+}
+
+.topbar-compact .role-pill,
+.topbar-compact .profile-copy {
+  display: none;
 }
 
 .searchbar {
@@ -164,6 +194,7 @@
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .connection-pill,
@@ -251,11 +282,26 @@
   opacity: 0.72;
 }
 
+.topbar-compact .logout-button {
+  width: 42px;
+  min-height: 42px;
+  justify-content: center;
+  padding: 0;
+}
+
+.topbar-compact .logout-label {
+  display: none;
+}
+
 .content-grid {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
   gap: 24px;
+  min-height: 0;
   padding: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .panel {
@@ -595,7 +641,9 @@
 .create-setlist,
 .start-button,
 .secondary-action,
-.outline-button {
+.outline-button,
+.teleprompter-back,
+.teleprompter-edit-button {
   cursor: pointer;
 }
 
@@ -716,6 +764,10 @@
   font-size: 0.88rem;
 }
 
+.catalog-add-button {
+  margin-top: 6px;
+}
+
 .catalog-filters {
   display: grid;
   gap: 16px;
@@ -762,7 +814,8 @@
 
 .catalog-submit,
 .catalog-clear,
-.catalog-page-button {
+.catalog-page-button,
+.catalog-danger-button {
   min-height: 42px;
   padding: 0 16px;
   border-radius: 12px;
@@ -782,9 +835,16 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.catalog-danger-button {
+  background: rgba(255, 107, 129, 0.1);
+  border-color: rgba(255, 107, 129, 0.22);
+  color: #ffb7c2;
+}
+
 .catalog-submit:disabled,
 .catalog-clear:disabled,
-.catalog-page-button:disabled {
+.catalog-page-button:disabled,
+.catalog-danger-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -821,7 +881,7 @@
 
 .songs-list-head,
 .songs-list-row {
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.95fr) minmax(0, 0.95fr) 110px 80px 70px 90px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr) minmax(0, 0.9fr) 100px 72px 64px 82px 100px;
 }
 
 .artists-list-head,
@@ -834,6 +894,11 @@
   min-width: 0;
 }
 
+.catalog-actions-cell {
+  display: flex;
+  align-items: center;
+}
+
 .catalog-primary-cell {
   display: grid;
   gap: 4px;
@@ -844,9 +909,26 @@
   font-size: 0.98rem;
 }
 
+.catalog-song-link {
+  color: #f5f7ff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.catalog-song-link:hover {
+  color: #11ebff;
+}
+
 .catalog-primary-cell span,
 .catalog-copy {
   color: #aeb4c8;
+}
+
+.catalog-local-tag {
+  color: #11ebff;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .catalog-pill {
@@ -873,12 +955,472 @@
   text-align: center;
 }
 
+.song-editor-form {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.song-artist-create-toggle {
+  align-content: end;
+}
+
+.song-artist-form {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(24, 232, 255, 0.12);
+  background: rgba(24, 232, 255, 0.05);
+}
+
+.song-artist-form h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.song-editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.song-editor-header h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.song-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.song-editor-wide {
+  grid-column: 1 / -1;
+}
+
+.song-editor-lyrics textarea {
+  width: 100%;
+  min-height: 240px;
+  resize: vertical;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(8, 10, 18, 0.62);
+  color: #edf0ff;
+  padding: 14px;
+  line-height: 1.6;
+  outline: 0;
+}
+
+.song-editor-lyrics textarea:focus {
+  border-color: rgba(24, 232, 255, 0.32);
+  box-shadow: 0 0 0 3px rgba(24, 232, 255, 0.08);
+}
+
+.song-editor-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #ccd1e4;
+}
+
+.song-editor-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: #a596ff;
+}
+
+.song-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .catalog-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.teleprompter-grid {
+  display: block;
+  grid-template-columns: 1fr;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.teleprompter-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(14px, 1.4vw, 22px);
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  padding: clamp(16px, 1.5vw, 22px);
+  overflow: hidden;
+}
+
+.teleprompter-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 116px;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.teleprompter-back,
+.teleprompter-selector,
+.teleprompter-edit-button,
+.teleprompter-action-button,
+.teleprompter-key-chip {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.teleprompter-back {
+  width: 42px;
+  justify-content: center;
+  padding: 0;
+  color: #edf0ff;
+}
+
+.teleprompter-back span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teleprompter-selector {
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 14px;
+}
+
+.teleprompter-selector select {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #edf0ff;
+  font: inherit;
+}
+
+.teleprompter-actions {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  min-width: 0;
+  grid-column: 2;
+  justify-self: end;
+}
+
+.teleprompter-adjustments {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teleprompter-action-button {
+  justify-content: center;
+  min-width: 42px;
+  color: #edf0ff;
+}
+
+.teleprompter-edit-button {
+  justify-content: center;
+  gap: 8px;
+  width: 116px;
+  min-width: 116px;
+  padding: 0 14px;
+  color: #edf0ff;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.teleprompter-edit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.teleprompter-key-chip {
+  justify-content: center;
+  min-width: 62px;
+  padding: 0 14px;
+  color: #edf0ff;
+  font-weight: 700;
+}
+
+.teleprompter-song-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: clamp(22px, 2.5vw, 34px);
+}
+
+.teleprompter-song-meta h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.05em;
+}
+
+.teleprompter-song-meta p {
+  margin: 0;
+  color: #9ea3b9;
+}
+
+.teleprompter-stage {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.teleprompter-scroll-area {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 2px 10px 18px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(191, 198, 255, 0.25) transparent;
+}
+
+.teleprompter-editor {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(180px, 1fr) auto auto;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.teleprompter-editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.teleprompter-editor-header h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+}
+
+.teleprompter-editor textarea {
+  width: 100%;
+  min-height: 0;
+  resize: none;
+  border: 1px solid rgba(191, 198, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(8, 10, 18, 0.72);
+  color: #f6f7ff;
+  padding: 16px;
+  font: 1rem/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  outline: 0;
+  overflow-y: auto;
+}
+
+.teleprompter-editor textarea:focus {
+  border-color: rgba(24, 232, 255, 0.32);
+  box-shadow: 0 0 0 3px rgba(24, 232, 255, 0.08);
+}
+
+.teleprompter-editor-help {
+  margin: 0;
+  color: #9ea3b9;
+  font-size: 0.88rem;
+}
+
+.teleprompter-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.teleprompter-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.teleprompter-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(191, 198, 255, 0.25);
+  border-radius: 999px;
+}
+
+.teleprompter-meta-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.teleprompter-meta-pills span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  color: #ccd1e4;
+  font-size: 0.8rem;
+}
+
+.teleprompter-sections {
+  display: grid;
+  gap: 34px;
+  --teleprompter-font-scale: 1;
+}
+
+.teleprompter-section-block {
+  display: grid;
+  gap: 16px;
+}
+
+.teleprompter-section-badge {
+  width: fit-content;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(140, 122, 255, 0.1);
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  color: #c8c4ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.teleprompter-lines {
+  display: grid;
+  gap: clamp(22px, 2.5vw, 30px);
+}
+
+.teleprompter-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 0;
+}
+
+.teleprompter-segment {
+  display: grid;
+  gap: 6px;
+  min-width: max-content;
+}
+
+.teleprompter-segment.chord-only {
+  margin-right: clamp(14px, 1.6vw, 24px);
+}
+
+.teleprompter-chord {
+  color: #11ebff;
+  font-size: calc(1rem * var(--teleprompter-font-scale));
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.teleprompter-lyric {
+  color: #f6f7ff;
+  font-size: clamp(1.2rem, 2.3vw, 2rem);
+  font-size: calc(clamp(1.2rem, 2.3vw, 2rem) * var(--teleprompter-font-scale));
+  white-space: pre-wrap;
+}
+
+.teleprompter-spacer {
+  height: 20px;
+}
+
+.teleprompter-empty {
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px dashed rgba(191, 198, 255, 0.14);
+  color: #aeb4c8;
+  text-align: center;
+}
+
+.teleprompter-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 76px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.25);
+}
+
+.teleprompter-play-button {
+  width: 52px;
+  height: 52px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5448e8 0%, #8f2ce3 100%);
+  color: #f8f7ff;
+  box-shadow: 0 14px 30px rgba(107, 72, 234, 0.34);
+}
+
+.teleprompter-font-button {
+  min-width: 52px;
+  font-weight: 700;
+}
+
+.teleprompter-reset-button {
+  min-width: 66px;
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.teleprompter-footer-group {
+  display: grid;
+  gap: 2px;
+  color: #edf0ff;
+  min-width: 0;
+}
+
+.teleprompter-footer-label {
+  color: #7f8598;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teleprompter-bpm-box,
+.teleprompter-sync-box {
+  padding-left: 16px;
+  border-left: 1px solid rgba(191, 198, 255, 0.08);
 }
 
 .page-state-card-loading {
@@ -943,7 +1485,29 @@
 
   .songs-list-head,
   .songs-list-row {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) 100px 80px 70px 80px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) 96px 70px 64px 80px 96px;
+  }
+
+  .teleprompter-toolbar {
+    grid-template-columns: auto minmax(0, 1fr) 116px;
+    align-items: stretch;
+  }
+
+  .teleprompter-actions {
+    justify-self: end;
+  }
+
+  .teleprompter-edit-button {
+    justify-self: end;
+  }
+
+  .teleprompter-selector select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .teleprompter-scroll-area {
+    max-height: none;
   }
 }
 
@@ -1001,6 +1565,18 @@
     align-items: stretch;
   }
 
+  .topbar-compact {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-compact .topbar-meta {
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+
   .setlist-actions-top,
   .duration-badge {
     align-self: stretch;
@@ -1016,6 +1592,20 @@
 
   .catalog-meta {
     justify-items: start;
+  }
+
+  .song-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .teleprompter-footer {
+    justify-content: flex-start;
+  }
+
+  .teleprompter-bpm-box,
+  .teleprompter-sync-box {
+    padding-left: 0;
+    border-left: 0;
   }
 
   .songs-list-head,
@@ -1041,7 +1631,8 @@
     gap: 4px;
   }
 
-  .catalog-cell::before {
+  .catalog-cell::before,
+  .catalog-primary-cell::before {
     content: attr(data-label);
     color: #7f8598;
     font-size: 0.68rem;
@@ -1050,13 +1641,19 @@
     text-transform: uppercase;
   }
 
-  .catalog-primary-cell::before {
-    content: attr(data-label);
-    color: #7f8598;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  .teleprompter-line {
+    gap: 14px 0;
+  }
+
+  .teleprompter-lyric {
+    font-size: 1.55rem;
+  }
+
+  .teleprompter-scroll-area {
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    padding-right: 0;
   }
 }
 
@@ -1074,6 +1671,34 @@
     padding: 16px;
   }
 
+  .topbar-compact {
+    min-height: 56px;
+    padding: 8px 14px;
+    gap: 10px;
+  }
+
+  .topbar-compact .connection-pill,
+  .topbar-compact .logout-button {
+    min-height: 38px;
+  }
+
+  .topbar-compact .connection-pill {
+    padding: 0 10px;
+  }
+
+  .topbar-compact .connection-label {
+    display: none;
+  }
+
+  .topbar-compact .profile-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .topbar-compact .logout-button {
+    width: 38px;
+  }
+
   .searchbar {
     max-width: none;
   }
@@ -1081,6 +1706,12 @@
   .topbar-meta {
     width: 100%;
     justify-content: flex-start;
+  }
+
+  .topbar-compact .topbar-meta {
+    width: auto;
+    flex-wrap: nowrap;
+    gap: 8px;
   }
 
   .connection-pill,
@@ -1092,6 +1723,10 @@
   .profile-chip {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .topbar-compact .profile-chip {
+    width: auto;
   }
 
   .profile-name,
@@ -1107,6 +1742,120 @@
     grid-template-columns: 1fr;
   }
 
+  .teleprompter-panel {
+    padding: 18px;
+    min-height: 0;
+  }
+
+  .teleprompter-toolbar {
+    grid-template-columns: auto minmax(0, 1fr) 116px;
+    gap: 10px;
+  }
+
+  .teleprompter-actions {
+    display: inline-flex;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: auto;
+  }
+
+  .teleprompter-adjustments {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 5;
+    width: min(calc(100vw - 64px), 330px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(191, 198, 255, 0.12);
+    border-radius: 18px;
+    background: rgba(18, 22, 34, 0.98);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+  }
+
+  .teleprompter-actions.is-open .teleprompter-adjustments {
+    display: grid;
+  }
+
+  .teleprompter-back {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .teleprompter-selector,
+  .teleprompter-edit-button {
+    box-sizing: border-box;
+  }
+
+  .teleprompter-edit-button {
+    grid-column: 3;
+    grid-row: 1;
+    width: 116px;
+  }
+
+  .teleprompter-action-button,
+  .teleprompter-key-chip {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .teleprompter-settings-button {
+    width: 42px;
+  }
+
+  .teleprompter-reset-button {
+    grid-column: 1 / -1;
+  }
+
+  .teleprompter-song-meta {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .teleprompter-meta-pills {
+    justify-content: flex-start;
+  }
+
+  .teleprompter-segment {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .teleprompter-lyric {
+    overflow-wrap: anywhere;
+  }
+
+  .teleprompter-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 8px 12px;
+  }
+
+  .teleprompter-bpm-box,
+  .teleprompter-sync-box {
+    display: none;
+  }
+
+  .teleprompter-editor {
+    padding: 12px;
+  }
+
+  .teleprompter-editor-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .teleprompter-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .catalog-filter-actions,
   .catalog-pagination {
     display: grid;
@@ -1115,13 +1864,32 @@
 
   .catalog-submit,
   .catalog-clear,
-  .catalog-page-button {
+  .catalog-page-button,
+  .catalog-danger-button {
     width: 100%;
+  }
+
+  .song-editor-header,
+  .song-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .song-editor-form {
+    padding: 14px;
   }
 
   .setlist-panel h1 {
     max-width: none;
     font-size: 2.2rem;
+  }
+
+  .teleprompter-song-meta h1 {
+    font-size: 2.2rem;
+  }
+
+  .teleprompter-lyric {
+    font-size: 1.3rem;
   }
 
   .setlist-location {
@@ -1221,6 +1989,20 @@
     gap: 14px;
   }
 
+  .topbar-compact {
+    gap: 8px;
+  }
+
+  .topbar-compact .connection-pill {
+    width: 38px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .topbar-compact .topbar-meta {
+    gap: 6px;
+  }
+
   .searchbar {
     min-height: 44px;
     padding: 0 14px;
@@ -1229,6 +2011,23 @@
   .topbar-menu-button {
     width: 40px;
     height: 40px;
+  }
+
+  .teleprompter-play-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .teleprompter-panel {
+    padding: 14px;
+  }
+
+  .teleprompter-scroll-area {
+    padding-right: 0;
+  }
+
+  .teleprompter-footer {
+    min-height: 54px;
   }
 
   .content-grid {
@@ -1243,20 +2042,14 @@
     font-size: 1.65rem;
   }
 
-  .songs-row {
-    grid-template-columns: 1fr;
-  }
-
+  .songs-row,
   .songs-list-row,
   .artists-list-row {
     grid-template-columns: 1fr;
   }
 
   .songs-index,
-  .songs-title-cell {
-    grid-column: auto;
-  }
-
+  .songs-title-cell,
   .catalog-primary-cell {
     grid-column: auto;
   }
