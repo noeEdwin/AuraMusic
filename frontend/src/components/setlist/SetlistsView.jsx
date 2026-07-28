@@ -256,7 +256,7 @@ function SetlistBuilderView({ setlistId }) {
     }
   }
 
-  function openTeleprompter(item, startSession = false) {
+  function openTeleprompter(item, { live = false, startSession = false } = {}) {
     if (!item?.song?.id) return
 
     const params = new URLSearchParams({
@@ -265,7 +265,7 @@ function SetlistBuilderView({ setlistId }) {
       itemId: String(item.id),
     })
 
-    if (setlist.bandId && bandMemberRole) {
+    if (live && setlist.bandId && bandMemberRole) {
       params.set('bandId', String(setlist.bandId))
       params.set('memberRole', bandMemberRole)
       if (startSession) params.set('startSession', 'true')
@@ -297,7 +297,7 @@ function SetlistBuilderView({ setlistId }) {
         <div className="builder-heading">
           <div><h1>{setlist.name}</h1><p>{setlist.description || 'Sin descripcion'}{setlist.eventDate ? ` · ${formatDate(setlist.eventDate)}` : ''}</p></div>
           <div className="builder-heading-actions">
-            <button className="catalog-submit builder-play-button" type="button" onClick={() => openTeleprompter(firstItem, bandMemberRole === 'LEADER')} disabled={!firstItem?.song?.id}>
+            <button className="catalog-submit builder-play-button" type="button" onClick={() => openTeleprompter(firstItem, { live: Boolean(bandMemberRole), startSession: bandMemberRole === 'LEADER' })} disabled={!firstItem?.song?.id}>
               <Icon type="play" /> {getSetlistStartLabel(setlist.bandId, bandMemberRole)}
             </button>
             {isEditingDetails ? (
