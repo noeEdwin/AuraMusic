@@ -1,6 +1,7 @@
 package com.auramusic.backend.catalog;
 
 import com.auramusic.backend.domain.entity.Song;
+import java.util.Collection;
 import org.springframework.data.jpa.domain.Specification;
 
 final class SongSpecifications {
@@ -34,5 +35,9 @@ final class SongSpecifications {
                 root.get("owner").get("id"),
                 ownerId
         );
+    }
+
+    static Specification<Song> ownerIn(Collection<Long> ownerIds) {
+        return (root, query, criteriaBuilder) -> root.get("owner").get("id").in(ownerIds);
     }
 }

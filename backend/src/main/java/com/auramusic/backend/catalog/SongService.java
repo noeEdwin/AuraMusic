@@ -4,12 +4,16 @@ import com.auramusic.backend.catalog.dto.CreateSongRequest;
 import com.auramusic.backend.catalog.dto.PageResponse;
 import com.auramusic.backend.catalog.dto.SongResponse;
 import com.auramusic.backend.catalog.dto.UpdateSongRequest;
+import com.auramusic.backend.domain.entity.BandMember;
 import com.auramusic.backend.domain.entity.Artist;
 import com.auramusic.backend.domain.entity.Song;
 import com.auramusic.backend.domain.entity.User;
 import com.auramusic.backend.repository.ArtistRepository;
+import com.auramusic.backend.repository.BandMemberRepository;
 import com.auramusic.backend.repository.SongRepository;
 import com.auramusic.backend.repository.UserRepository;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,15 +33,18 @@ public class SongService {
 
     private final SongRepository songRepository;
     private final ArtistRepository artistRepository;
+    private final BandMemberRepository bandMemberRepository;
     private final UserRepository userRepository;
 
     public SongService(
             SongRepository songRepository,
             ArtistRepository artistRepository,
+            BandMemberRepository bandMemberRepository,
             UserRepository userRepository
     ) {
         this.songRepository = songRepository;
         this.artistRepository = artistRepository;
+        this.bandMemberRepository = bandMemberRepository;
         this.userRepository = userRepository;
     }
 
@@ -47,9 +54,12 @@ public class SongService {
             String genre,
             Long artistId,
             Long ownerId,
-            Pageable pageable
+            Pageable pageable,
+            String email
     ) {
+        User user = findUser(email);
         Specification<Song> specification = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+        specification = specification.and(SongSpecifications.ownerIn(findVisibleOwnerIds(user)));
         if (hasText(title)) {
             specification = specification.and(SongSpecifications.titleContains(title));
         }
@@ -69,8 +79,11 @@ public class SongService {
     }
 
     @Transactional(readOnly = true)
-    public SongResponse getById(Long id) {
-        return SongResponse.from(findSong(id));
+    public SongResponse getById(Long id, String email) {
+        User user = findUser(email);
+        Song song = findSong(id);
+        assertCanView(song, user);
+        return SongResponse.from(song);
     }
 
     @Transactional
@@ -132,6 +145,24 @@ public class SongService {
             return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar esta cancion");
+    }
+
+    private void assertCanView(Song song, User user) {
+        if (song.getOwner() != null && findVisibleOwnerIds(user).contains(song.getOwner().getId())) {
+            return;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para ver esta cancion");
+    }
+
+    private Set<Long> findVisibleOwnerIds(User user) {
+        Set<Long> ownerIds = new HashSet<>();
+        ownerIds.add(user.getId());
+        for (BandMember membership : bandMemberRepository.findByUserId(user.getId())) {
+            for (BandMember bandMember : bandMemberRepository.findByBandId(membership.getBand().getId())) {
+                ownerIds.add(bandMember.getUser().getId());
+            }
+        }
+        return ownerIds;
     }
 
     private boolean isAdmin(User user) {

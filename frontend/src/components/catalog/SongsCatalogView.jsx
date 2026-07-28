@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom'
 import { createArtist, createSong, deleteSong, fetchArtistsCatalog, fetchSongsCatalog } from '../../catalog/catalogApi'
 import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
-import { mockTeleprompterSongs } from '../../teleprompter/mockTeleprompterSongs'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import { CatalogPagination } from './CatalogPagination'
+import './catalog.css'
 
 const PAGE_SIZE = 6
 const EMPTY_SONG_FORM = {
@@ -24,7 +24,6 @@ const EMPTY_SONG_FORM = {
 const EMPTY_ARTIST_FORM = {
   name: '',
   bio: '',
-  imageUrl: '',
 }
 
 export function SongsCatalogView() {
@@ -107,6 +106,21 @@ export function SongsCatalogView() {
     }
   }, [filters, page, refreshKey])
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setPage(0)
+      setFilters((current) => {
+        if (current.title === draftFilters.title && current.genre === draftFilters.genre) {
+          return current
+        }
+
+        return draftFilters
+      })
+    }, 350)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [draftFilters])
+
   function handleDraftChange(event) {
     const { name, value } = event.target
     setDraftFilters((current) => ({ ...current, [name]: value }))
@@ -162,7 +176,6 @@ export function SongsCatalogView() {
       const artist = await createArtist({
         name: artistForm.name.trim(),
         bio: normalizeOptionalString(artistForm.bio),
-        imageUrl: normalizeOptionalString(artistForm.imageUrl),
       })
       setArtists((current) => [...current, artist].sort((first, second) => first.name.localeCompare(second.name)))
       setSongForm((current) => ({ ...current, artistId: String(artist.id) }))
@@ -220,10 +233,7 @@ export function SongsCatalogView() {
     }
   }
 
-  const songs = [
-    ...mockTeleprompterSongs,
-    ...(catalog?.content ?? []),
-  ]
+  const songs = catalog?.content ?? []
 
   return (
     <AppShellLayout contentClassName="content-grid catalog-grid">
@@ -232,7 +242,7 @@ export function SongsCatalogView() {
           <div className="catalog-title-group">
             <span className="page-panel-badge">Catalogo</span>
             <h1>Canciones</h1>
-            <p>Consulta canciones con filtros del servidor y navegacion paginada real.</p>
+            <p>Consulta canciones con busqueda dinamica y navegacion paginada real.</p>
           </div>
 
           <div className="catalog-meta">
@@ -259,7 +269,7 @@ export function SongsCatalogView() {
 
           <div className="catalog-filter-actions">
             <button className="catalog-submit" type="submit" disabled={isLoading}>
-              {isLoading ? 'Buscando...' : 'Aplicar filtros'}
+              {isLoading ? 'Buscando...' : 'Buscar ahora'}
             </button>
             <button className="catalog-clear" type="button" onClick={handleClearFilters} disabled={isLoading}>
               Limpiar
@@ -339,10 +349,6 @@ export function SongsCatalogView() {
                     <span>Nombre</span>
                     <input name="name" value={artistForm.name} onChange={handleArtistFormChange} maxLength={120} placeholder="Nombre del artista" />
                   </label>
-                  <label className="catalog-field">
-                    <span>URL de imagen</span>
-                    <input name="imageUrl" value={artistForm.imageUrl} onChange={handleArtistFormChange} maxLength={500} placeholder="https://..." />
-                  </label>
                   <label className="catalog-field song-editor-wide">
                     <span>Bio</span>
                     <input name="bio" value={artistForm.bio} onChange={handleArtistFormChange} maxLength={5000} placeholder="Descripcion breve" />
@@ -407,7 +413,6 @@ export function SongsCatalogView() {
                   <Link className="catalog-song-link" to={`/teleprompter?songId=${song.id}`}>
                     {song.title}
                   </Link>
-                  {typeof song.id === 'string' ? <span className="catalog-local-tag">Demo local para teleprompter</span> : null}
                 </div>
                 <div className="catalog-cell" data-label="Artista">{song.artist?.name ?? 'Artista sin asignar'}</div>
                  <div className="catalog-cell" data-label="Album">{song.album ?? 'Sin album'}</div>
@@ -418,12 +423,10 @@ export function SongsCatalogView() {
                 <div className="catalog-cell" data-label="BPM">{song.bpm ?? 'N/D'}</div>
                 <div className="catalog-cell" data-label="Duracion">{formatDuration(song.durationSeconds)}</div>
                 <div className="catalog-cell catalog-actions-cell" data-label="Acciones">
-                   {typeof song.id === 'string' ? (
-                     <span className="catalog-local-tag">Demo</span>
-                   ) : canModifySong(song, role, user) ? (
-                     <button className="catalog-danger-button" type="button" onClick={() => handleDeleteSong(song)} disabled={deletingSongId === song.id}>
-                       {deletingSongId === song.id ? 'Eliminando...' : 'Eliminar'}
-                     </button>
+                   {canModifySong(song, role, user) ? (
+                      <button className="catalog-danger-button" type="button" onClick={() => handleDeleteSong(song)} disabled={deletingSongId === song.id}>
+                        {deletingSongId === song.id ? 'Eliminando...' : 'Eliminar'}
+                      </button>
                    ) : <span className="catalog-local-tag">Solo lectura</span>}
                 </div>
               </article>

@@ -15,7 +15,7 @@ export function LoginView() {
   const navigate = useNavigate()
   const { authFeedback, clearAuthFeedback, login } = useAuth()
   const [values, setValues] = useState({
-    email: '',
+    email: location.state?.email ?? '',
     password: '',
   })
   const [touchedFields, setTouchedFields] = useState({})
@@ -87,8 +87,8 @@ export function LoginView() {
     >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <StatusBanner
-          message={location.state?.from ? 'Inicia sesion para continuar con la ruta solicitada.' : authFeedback?.message}
-          tone={location.state?.from ? 'info' : authFeedback?.tone}
+          message={getLoginFeedbackMessage(location.state, authFeedback)}
+          tone={getLoginFeedbackTone(location.state, authFeedback)}
         />
 
         <AuthField
@@ -125,4 +125,20 @@ export function LoginView() {
       </form>
     </AuthLayout>
   )
+}
+
+function getLoginFeedbackMessage(locationState, authFeedback) {
+  if (locationState?.from) {
+    return 'Inicia sesion para continuar con la ruta solicitada.'
+  }
+
+  if (locationState?.registered) {
+    return 'Cuenta creada correctamente. Inicia sesion para continuar.'
+  }
+
+  return authFeedback?.message
+}
+
+function getLoginFeedbackTone(locationState, authFeedback) {
+  return locationState?.from || locationState?.registered ? 'info' : authFeedback?.tone
 }

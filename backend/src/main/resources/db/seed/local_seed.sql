@@ -17,35 +17,6 @@ INSERT INTO users (id, role_id, username, email, password_hash, display_name, av
     (11, 3, 'andres.lofi', 'andres.lofi@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Andres Lofi', 'https://images.auramusic.local/avatars/andres-lofi.png', TRUE),
     (12, 3, 'camila.pop', 'camila.pop@auramusic.local', '$2a$10$D5QC3XzN5By1xHP8xeIvQepKAsupbPul.krHwVu8mWuHzoLt3ik2G', 'Camila Pop', 'https://images.auramusic.local/avatars/camila-pop.png', TRUE);
 
-INSERT INTO artists (id, name, bio, image_url) VALUES
-    (1, 'Luna Vale', 'Cantautora de pop atmosferico con sonidos nocturnos.', 'https://images.auramusic.local/artists/luna-vale.png'),
-    (2, 'Neon River', 'Duo electronico con sintetizadores brillantes y bajos profundos.', 'https://images.auramusic.local/artists/neon-river.png'),
-    (3, 'Atlas Nova', 'Productor de indie rock espacial y texturas analogas.', 'https://images.auramusic.local/artists/atlas-nova.png'),
-    (4, 'Maya Sol', 'Vocalista latina con mezcla de soul, pop y ritmos calidos.', 'https://images.auramusic.local/artists/maya-sol.png'),
-    (5, 'Echo Harbor', 'Proyecto alternativo inspirado en paisajes costeros.', 'https://images.auramusic.local/artists/echo-harbor.png'),
-    (6, 'Velvet North', 'Banda de rock suave con guitarras ambientales.', 'https://images.auramusic.local/artists/velvet-north.png'),
-    (7, 'Solar Kids', 'Colectivo juvenil de dance pop y hooks luminosos.', 'https://images.auramusic.local/artists/solar-kids.png'),
-    (8, 'Midnight Bloom', 'Proyecto dream pop con voces etereas.', 'https://images.auramusic.local/artists/midnight-bloom.png'),
-    (9, 'Rocco Beats', 'Beatmaker urbano enfocado en trap melodico.', 'https://images.auramusic.local/artists/rocco-beats.png'),
-    (10, 'Aurora Fields', 'Compositora de folk moderno y arreglos acusticos.', 'https://images.auramusic.local/artists/aurora-fields.png');
-
-INSERT INTO songs (id, artist_id, owner_user_id, album, title, lyrics, duration_seconds, genre, original_key, bpm, explicit_content, play_count) VALUES
-    (1, 1, 3, 'Noche Cristal', 'Cristal Azul', '[VERSO]\n[G]Luz sobre el mar\n[Em]brilla al despertar\n[CORO]\n[C]Cristal azul\n[D]me guia tu voz', 214, 'Pop', 'G', 116, FALSE, 12450),
-    (2, 1, 3, 'Noche Cristal', 'Luces en Silencio', '[VERSO]\n[Am]Calles sin final\n[F]luces al pasar\n[CORO]\n[C]Todo vuelve a sonar\n[G]si te quedas aca', 198, 'Pop', 'C', 104, FALSE, 9800),
-    (3, 2, 4, 'Electric Delta', 'Delta Neon', '[INTRO]\n[Dm]Pulso digital\n[Bb]noche artificial\n[CORO]\n[F]Delta neon\n[C]enciende la ciudad', 243, 'Electronica', 'Dm', 128, FALSE, 20230),
-    (4, 2, 4, 'Electric Delta', 'Circuitos', '[VERSO]\n[Em]Corre la senal\n[C]no puedo parar\n[CORO]\n[G]Circuitos de luz\n[D]me llevan a ti', 226, 'Electronica', 'Em', 122, FALSE, 17590),
-    (5, 3, 5, 'Orbita Interior', 'Gravedad Cero', '[VERSO]\n[A]Subo sin mirar\n[F#m]dejo de pesar\n[CORO]\n[D]Gravedad cero\n[E]vuelvo a respirar', 251, 'Indie Rock', 'A', 98, FALSE, 8420),
-    (6, 3, 5, 'Orbita Interior', 'Mapa Lunar', '[VERSO]\n[C]Trazo una senal\n[Am]sobre el vendaval\n[CORO]\n[F]Mapa lunar\n[G]para regresar', 233, 'Indie Rock', 'C', 92, FALSE, 7630),
-    (7, 4, 6, 'Raiz Dorada', 'Sol de Enero', '[VERSO]\n[D]Sol de enero\n[Bm]sobre mi piel\n[CORO]\n[G]Canta la raiz\n[A]vuelve a crecer', 207, 'Latin Pop', 'D', 112, FALSE, 14320),
-    (8, 4, 6, 'Raiz Dorada', 'Raiz', '[VERSO]\n[Am]Vengo del sur\n[F]con fuego y luz\n[CORO]\n[C]Raiz de mi voz\n[G]late en tu cancion', 219, 'Soul', 'Am', 86, FALSE, 11110),
-    (9, 5, 7, 'Puerto Invisible', 'Muelle Fantasma', '[VERSO]\n[Em]Muelle sin final\n[C]barcos al azar\n[CORO]\n[G]Fantasma del mar\n[D]no me dejes atras', 245, 'Alternative', 'Em', 90, FALSE, 6510),
-    (10, 6, 8, 'Northern Velvet', 'Soft Thunder', '[VERSO]\n[E]Soft thunder rain\n[C#m]falling again\n[CORO]\n[A]Hold the night\n[B]turn on the light', 230, 'Soft Rock', 'E', 96, FALSE, 7290),
-    (11, 7, 9, 'Solar Club', 'Club Solar', '[VERSO]\n[F]Brilla el lugar\n[Dm]no quiero parar\n[CORO]\n[Bb]Club solar\n[C]vamos a bailar', 204, 'Dance Pop', 'F', 124, FALSE, 18880),
-    (12, 7, 9, 'Solar Club', 'Verano Digital', '[VERSO]\n[G]Verano digital\n[Em]playa virtual\n[CORO]\n[C]Sube la senal\n[D]no mires atras', 216, 'Dance Pop', 'G', 126, FALSE, 15940),
-    (13, 8, 10, 'Bloom After Midnight', 'Flor Nocturna', '[VERSO]\n[Bm]Flor nocturna\n[G]cerca de mi\n[CORO]\n[D]Abre tu luz\n[A]dejame seguir', 260, 'Dream Pop', 'Bm', 80, FALSE, 5330),
-    (14, 9, 11, 'Beat District', 'Distrito Bajo', '[VERSO]\n[Cm]Distrito bajo\n[Ab]suena en la estacion\n[CORO]\n[Eb]Sube el bajo\n[Bb]late el corazon', 192, 'Trap', 'Cm', 140, TRUE, 22100),
-    (15, 10, 12, 'Campos de Aurora', 'Camino Aurora', '[VERSO]\n[D]Camino aurora\n[G]vuelve a nacer\n[CORO]\n[Bm]Canta la tierra\n[A]al amanecer', 238, 'Folk', 'D', 78, FALSE, 6890);
-
 INSERT INTO playlists (id, user_id, name, description, cover_url, public) VALUES
     (1, 7, 'Dark Glass Coding', 'Musica para programar interfaces de noche.', 'https://images.auramusic.local/playlists/dark-glass-coding.png', TRUE),
     (2, 8, 'Pop Para La Tarde', 'Canciones ligeras para escuchar despues de clases.', 'https://images.auramusic.local/playlists/pop-tarde.png', TRUE),
@@ -57,31 +28,6 @@ INSERT INTO playlists (id, user_id, name, description, cover_url, public) VALUES
     (8, 2, 'Novedades Staff', 'Canciones destacadas por administradores.', 'https://images.auramusic.local/playlists/novedades-staff.png', TRUE),
     (9, 7, 'Electronic Focus', 'Electronica y dance pop para concentrarse.', 'https://images.auramusic.local/playlists/electronic-focus.png', TRUE),
     (10, 8, 'Domingo Acustico', 'Folk y pop tranquilo para descansar.', 'https://images.auramusic.local/playlists/domingo-acustico.png', TRUE);
-
-INSERT INTO playlist_songs (playlist_id, song_id, position) VALUES
-    (1, 3, 1),
-    (1, 4, 2),
-    (1, 11, 3),
-    (2, 1, 1),
-    (2, 2, 2),
-    (2, 7, 3),
-    (3, 14, 1),
-    (3, 12, 2),
-    (4, 8, 1),
-    (4, 13, 2),
-    (5, 5, 1),
-    (5, 15, 2),
-    (6, 3, 1),
-    (6, 11, 2),
-    (6, 14, 3),
-    (7, 1, 1),
-    (7, 6, 2),
-    (8, 9, 1),
-    (8, 10, 2),
-    (9, 4, 1),
-    (9, 12, 2),
-    (10, 15, 1),
-    (10, 7, 2);
 
 INSERT INTO bands (id, leader_user_id, name, description, invite_code) VALUES
     (1, 3, 'Luna Session Band', 'Banda de apoyo para shows de Luna Vale.', 'LUNA-2026-AURA'),
@@ -104,17 +50,3 @@ INSERT INTO setlists (id, owner_user_id, band_id, name, description, event_date)
     (2, 4, 2, 'Neon Club Session', 'Set electronico para evento en club.', '2026-08-02'),
     (3, 5, 3, 'Atlas Indie Night', 'Setlist indie rock con pausas cortas.', '2026-08-09'),
     (4, 12, NULL, 'Camila Solo Acustico', 'Repertorio personal de musico solista.', '2026-08-16');
-
-INSERT INTO setlist_items (id, setlist_id, song_id, position, transpose_steps, break_seconds, notes) VALUES
-    (1, 1, 1, 1, 0, 15, 'Abrir con luces bajas'),
-    (2, 1, 2, 2, 1, 30, 'Subir un semitono para la voz invitada'),
-    (3, 1, 7, 3, 0, 45, 'Presentar a la banda antes del coro'),
-    (4, 2, 3, 1, 0, 10, 'Entrada con click track'),
-    (5, 2, 4, 2, -1, 20, 'Transicion directa'),
-    (6, 2, 11, 3, 0, 30, 'Final extendido'),
-    (7, 3, 5, 1, 0, 20, 'Afinacion estandar'),
-    (8, 3, 6, 2, 2, 30, 'Version mas brillante'),
-    (9, 3, 10, 3, 0, 60, 'Pausa para cambio de guitarra'),
-    (10, 4, 15, 1, 0, 15, 'Inicio acustico'),
-    (11, 4, 13, 2, -2, 30, 'Tono mas comodo'),
-    (12, 4, 8, 3, 0, 45, 'Cierre con coros');
