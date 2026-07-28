@@ -20,7 +20,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:5173");
+                .setAllowedOrigins(
+                        "http://localhost:5173",
+                        "http://auramusic.lat",
+                        "https://auramusic.lat",
+                        "http://142.93.14.114",
+                        "https://142.93.14.114"
+                );
     }
 
     @Override
