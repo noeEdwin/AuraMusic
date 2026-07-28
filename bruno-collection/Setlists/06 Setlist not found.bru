@@ -1,0 +1,15 @@
+meta {
+  name: Setlist not found
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/setlists/999999
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

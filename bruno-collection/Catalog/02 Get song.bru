@@ -1,0 +1,15 @@
+meta {
+  name: Get song
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/songs/{{songId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

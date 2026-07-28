@@ -1,0 +1,20 @@
+meta {
+  name: GET_SONGS
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/songs
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

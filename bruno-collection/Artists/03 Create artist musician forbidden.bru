@@ -1,0 +1,23 @@
+meta {
+  name: Create artist musician forbidden
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/artists
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Artist Forbidden Before Ownership",
+    "bio": "Debe devolver 403 hasta implementar ownership"
+  }
+}

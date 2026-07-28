@@ -1,0 +1,34 @@
+meta {
+  name: Add song item
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}/items
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "songId": {{songId}},
+    "position": 1,
+    "transposeSteps": 0,
+    "breakSeconds": 30,
+    "notes": "Entrada de prueba"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  const item = data.items ? data.items[data.items.length - 1] : data;
+  if (item && item.id) {
+    bru.setVar("itemId", item.id);
+  }
+}

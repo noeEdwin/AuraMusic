@@ -1,0 +1,15 @@
+meta {
+  name: Delete song
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/songs/{{songId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

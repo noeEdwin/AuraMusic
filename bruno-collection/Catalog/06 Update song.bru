@@ -1,0 +1,30 @@
+meta {
+  name: Update song
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/songs/{{songId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "artistId": 1,
+    "album": "Bruno Collection Updated",
+    "title": "Cancion Bruno Actualizada",
+    "lyrics": "[CORO]\n[G]Prueba actualizada",
+    "durationSeconds": 190,
+    "genre": "Pop",
+    "originalKey": "G",
+    "bpm": 104,
+    "explicitContent": false
+  }
+}

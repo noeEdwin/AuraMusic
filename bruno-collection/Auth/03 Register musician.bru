@@ -1,0 +1,30 @@
+meta {
+  name: Register musician
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "bruno.musician",
+    "email": "bruno.musician@auramusic.local",
+    "password": "AuraBruno1!",
+    "displayName": "Bruno Musician",
+    "role": "MUSICIAN"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("musicianToken", data.token);
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Invalid song validation
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/songs
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "artistId": 1,
+    "title": "",
+    "durationSeconds": 0
+  }
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Create band
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/bands
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Rehearsal Band",
+    "description": "Banda creada para validar el flujo de bandas",
+    "instrument": "Guitarra"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("bandId", data.id);
+}

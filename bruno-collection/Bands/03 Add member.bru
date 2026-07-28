@@ -1,0 +1,23 @@
+meta {
+  name: Add member
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/bands/{{bandId}}/members
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "userEmail": "diego.ui@auramusic.local",
+    "instrument": "Bateria"
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Reorder items
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}/items/reorder
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "itemIds": [{{itemId}}]
+  }
+}

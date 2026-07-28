@@ -1,0 +1,22 @@
+meta {
+  name: Duplicate setlist
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/setlists/{{setlistId}}/duplicate
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Setlist Copy"
+  }
+}

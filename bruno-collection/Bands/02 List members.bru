@@ -1,0 +1,15 @@
+meta {
+  name: List members
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/bands/{{bandId}}/members
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Create setlist
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/setlists
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Bruno Setlist",
+    "description": "Setlist para pruebas de Bruno",
+    "eventDate": "2026-07-28",
+    "bandId": {{bandId}}
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("setlistId", data.id);
+}

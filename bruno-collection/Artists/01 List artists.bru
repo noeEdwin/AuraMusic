@@ -1,0 +1,15 @@
+meta {
+  name: List artists
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/artists?page=0&size=10&name=Luna
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Create song
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/songs
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "artistId": 1,
+    "album": "Bruno Collection",
+    "title": "Cancion Bruno",
+    "lyrics": "[VERSO]\n[C]Prueba de catalogo",
+    "durationSeconds": 180,
+    "genre": "Pop",
+    "originalKey": "C",
+    "bpm": 100,
+    "explicitContent": false
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("songId", data.id);
+}

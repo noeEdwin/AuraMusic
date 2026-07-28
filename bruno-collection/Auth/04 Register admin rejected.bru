@@ -1,0 +1,25 @@
+meta {
+  name: Register admin rejected
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "bruno.admin.invalid",
+    "email": "bruno.admin.invalid@auramusic.local",
+    "password": "AuraBruno1!",
+    "displayName": "Invalid Admin",
+    "role": "ADMIN"
+  }
+}
