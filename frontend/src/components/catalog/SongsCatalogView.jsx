@@ -10,7 +10,6 @@ import { StatusBanner } from '../shared/StatusBanner'
 import { CatalogPagination } from './CatalogPagination'
 
 const PAGE_SIZE = 6
-const INTERNAL_AUDIO_URL = 'pending-audio'
 const EMPTY_SONG_FORM = {
   artistId: '',
   title: '',
@@ -409,7 +408,7 @@ export function SongsCatalogView() {
                   {typeof song.id === 'string' ? <span className="catalog-local-tag">Demo local para teleprompter</span> : null}
                 </div>
                 <div className="catalog-cell" data-label="Artista">{song.artist?.name ?? 'Artista sin asignar'}</div>
-                <div className="catalog-cell" data-label="Album">{song.album?.title ?? 'Sin album'}</div>
+                 <div className="catalog-cell" data-label="Album">{song.album ?? 'Sin album'}</div>
                 <div className="catalog-cell" data-label="Genero">
                   <span className="catalog-pill">{song.genre ?? 'Sin genero'}</span>
                 </div>
@@ -445,16 +444,13 @@ export function SongsCatalogView() {
 function buildCreateSongPayload(form) {
   return {
     artistId: Number(form.artistId),
-    albumId: null,
+    album: null,
     title: form.title.trim(),
     lyrics: form.lyrics,
     durationSeconds: Number(form.durationSeconds),
     genre: normalizeOptionalString(form.genre),
     originalKey: normalizeOptionalString(form.originalKey),
     bpm: normalizeOptionalNumber(form.bpm),
-    audioUrl: INTERNAL_AUDIO_URL,
-    coverUrl: null,
-    trackNumber: null,
     explicitContent: form.explicitContent,
   }
 }

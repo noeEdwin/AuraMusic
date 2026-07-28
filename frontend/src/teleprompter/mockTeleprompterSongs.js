@@ -71,19 +71,13 @@ export const mockTeleprompterSongs = [
     genre: 'Rock Latino',
     originalKey: 'Em',
     bpm: 108,
-    audioUrl: null,
-    coverUrl: null,
-    trackNumber: 1,
     explicitContent: false,
     playCount: 0,
     artist: {
       id: 'mock-artist-kumbala',
       name: 'AuraMusic Demo Band',
     },
-    album: {
-      id: 'mock-album-kumbala',
-      title: 'Teleprompter Sessions',
-    },
+    album: 'Teleprompter Sessions',
     owner: {
       id: 'mock-owner-kumbala',
       displayName: 'AuraMusic Demo',

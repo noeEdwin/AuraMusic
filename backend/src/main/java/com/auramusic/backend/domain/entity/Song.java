@@ -29,9 +29,8 @@ public class Song {
     @JoinColumn(name = "owner_user_id")
     private User owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "album_id")
-    private Album album;
+    @Column(length = 160)
+    private String album;
 
     @Column(nullable = false, length = 160)
     private String title;
@@ -49,15 +48,6 @@ public class Song {
     private String originalKey;
 
     private Integer bpm;
-
-    @Column(name = "audio_url", nullable = false, length = 500)
-    private String audioUrl;
-
-    @Column(name = "cover_url", length = 500)
-    private String coverUrl;
-
-    @Column(name = "track_number")
-    private Integer trackNumber;
 
     @Column(name = "explicit_content", nullable = false)
     private Boolean explicitContent = false;
@@ -79,8 +69,8 @@ public class Song {
     public void setArtist(Artist artist) { this.artist = artist; }
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
-    public Album getAlbum() { return album; }
-    public void setAlbum(Album album) { this.album = album; }
+    public String getAlbum() { return album; }
+    public void setAlbum(String album) { this.album = album; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getLyrics() { return lyrics; }
@@ -93,12 +83,6 @@ public class Song {
     public void setOriginalKey(String originalKey) { this.originalKey = originalKey; }
     public Integer getBpm() { return bpm; }
     public void setBpm(Integer bpm) { this.bpm = bpm; }
-    public String getAudioUrl() { return audioUrl; }
-    public void setAudioUrl(String audioUrl) { this.audioUrl = audioUrl; }
-    public String getCoverUrl() { return coverUrl; }
-    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
-    public Integer getTrackNumber() { return trackNumber; }
-    public void setTrackNumber(Integer trackNumber) { this.trackNumber = trackNumber; }
     public Boolean getExplicitContent() { return explicitContent; }
     public void setExplicitContent(Boolean explicitContent) { this.explicitContent = explicitContent; }
     public Long getPlayCount() { return playCount; }

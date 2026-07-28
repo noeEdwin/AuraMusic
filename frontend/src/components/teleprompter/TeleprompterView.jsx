@@ -429,7 +429,7 @@ export function TeleprompterView() {
               <header className="teleprompter-song-meta">
                 <div>
                   <h1>{selectedSong.title}</h1>
-                  <p>{selectedSong.artist?.name ?? 'Artista sin asignar'} · {selectedSong.album?.title ?? 'Sin album'}</p>
+                  <p>{selectedSong.artist?.name ?? 'Artista sin asignar'} · {selectedSong.album ?? 'Sin album'}</p>
                 </div>
                 <div className="teleprompter-meta-pills">
                   <span>{selectedSong.genre ?? 'Sin genero'}</span>
@@ -511,16 +511,13 @@ export function TeleprompterView() {
 function buildUpdateSongPayload(song, lyrics) {
   return {
     artistId: song.artist?.id,
-    albumId: song.album?.id ?? null,
+    album: song.album ?? null,
     title: song.title,
     lyrics,
     durationSeconds: song.durationSeconds,
     genre: song.genre,
     originalKey: song.originalKey,
     bpm: song.bpm,
-    audioUrl: song.audioUrl,
-    coverUrl: song.coverUrl,
-    trackNumber: song.trackNumber,
     explicitContent: Boolean(song.explicitContent),
   }
 }

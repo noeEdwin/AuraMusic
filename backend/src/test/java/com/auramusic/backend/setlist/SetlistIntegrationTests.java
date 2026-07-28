@@ -62,7 +62,6 @@ class SetlistIntegrationTests {
         jdbcTemplate.update("DELETE FROM playlist_songs");
         jdbcTemplate.update("DELETE FROM playlists");
         jdbcTemplate.update("DELETE FROM songs");
-        jdbcTemplate.update("DELETE FROM albums");
         jdbcTemplate.update("DELETE FROM artists");
         jdbcTemplate.update("DELETE FROM users");
         jdbcTemplate.update("DELETE FROM roles");
@@ -174,8 +173,8 @@ class SetlistIntegrationTests {
 
     private void insertSong(Long artistId, String title, int duration) {
         jdbcTemplate.update("""
-                INSERT INTO songs (artist_id, title, duration_seconds, genre, audio_url, explicit_content, play_count, created_at, updated_at)
-                VALUES (?, ?, ?, 'Pop', 'https://audio.example/song.mp3', FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                INSERT INTO songs (artist_id, title, duration_seconds, genre, explicit_content, play_count, created_at, updated_at)
+                VALUES (?, ?, ?, 'Pop', FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """, artistId, title, duration);
     }
 }

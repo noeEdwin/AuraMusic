@@ -48,7 +48,6 @@ class BandIntegrationTests {
         jdbcTemplate.update("DELETE FROM playlist_songs");
         jdbcTemplate.update("DELETE FROM playlists");
         jdbcTemplate.update("DELETE FROM songs");
-        jdbcTemplate.update("DELETE FROM albums");
         jdbcTemplate.update("DELETE FROM artists");
         jdbcTemplate.update("DELETE FROM band_members");
         jdbcTemplate.update("DELETE FROM bands");

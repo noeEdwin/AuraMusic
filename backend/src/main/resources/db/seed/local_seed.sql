@@ -29,34 +29,22 @@ INSERT INTO artists (id, name, bio, image_url) VALUES
     (9, 'Rocco Beats', 'Beatmaker urbano enfocado en trap melodico.', 'https://images.auramusic.local/artists/rocco-beats.png'),
     (10, 'Aurora Fields', 'Compositora de folk moderno y arreglos acusticos.', 'https://images.auramusic.local/artists/aurora-fields.png');
 
-INSERT INTO albums (id, artist_id, title, cover_url, release_date) VALUES
-    (1, 1, 'Noche Cristal', 'https://images.auramusic.local/albums/noche-cristal.png', '2025-02-14'),
-    (2, 2, 'Electric Delta', 'https://images.auramusic.local/albums/electric-delta.png', '2025-03-08'),
-    (3, 3, 'Orbita Interior', 'https://images.auramusic.local/albums/orbita-interior.png', '2024-11-22'),
-    (4, 4, 'Raiz Dorada', 'https://images.auramusic.local/albums/raiz-dorada.png', '2025-05-01'),
-    (5, 5, 'Puerto Invisible', 'https://images.auramusic.local/albums/puerto-invisible.png', '2024-09-18'),
-    (6, 6, 'Northern Velvet', 'https://images.auramusic.local/albums/northern-velvet.png', '2025-01-30'),
-    (7, 7, 'Solar Club', 'https://images.auramusic.local/albums/solar-club.png', '2025-06-12'),
-    (8, 8, 'Bloom After Midnight', 'https://images.auramusic.local/albums/bloom-after-midnight.png', '2024-12-05'),
-    (9, 9, 'Beat District', 'https://images.auramusic.local/albums/beat-district.png', '2025-04-19'),
-    (10, 10, 'Campos de Aurora', 'https://images.auramusic.local/albums/campos-aurora.png', '2024-10-10');
-
-INSERT INTO songs (id, artist_id, owner_user_id, album_id, title, lyrics, duration_seconds, genre, original_key, bpm, audio_url, cover_url, track_number, explicit_content, play_count) VALUES
-    (1, 1, 3, 1, 'Cristal Azul', '[VERSO]\n[G]Luz sobre el mar\n[Em]brilla al despertar\n[CORO]\n[C]Cristal azul\n[D]me guia tu voz', 214, 'Pop', 'G', 116, 'https://audio.auramusic.local/songs/cristal-azul.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 1, FALSE, 12450),
-    (2, 1, 3, 1, 'Luces en Silencio', '[VERSO]\n[Am]Calles sin final\n[F]luces al pasar\n[CORO]\n[C]Todo vuelve a sonar\n[G]si te quedas aca', 198, 'Pop', 'C', 104, 'https://audio.auramusic.local/songs/luces-en-silencio.mp3', 'https://images.auramusic.local/albums/noche-cristal.png', 2, FALSE, 9800),
-    (3, 2, 4, 2, 'Delta Neon', '[INTRO]\n[Dm]Pulso digital\n[Bb]noche artificial\n[CORO]\n[F]Delta neon\n[C]enciende la ciudad', 243, 'Electronica', 'Dm', 128, 'https://audio.auramusic.local/songs/delta-neon.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 1, FALSE, 20230),
-    (4, 2, 4, 2, 'Circuitos', '[VERSO]\n[Em]Corre la senal\n[C]no puedo parar\n[CORO]\n[G]Circuitos de luz\n[D]me llevan a ti', 226, 'Electronica', 'Em', 122, 'https://audio.auramusic.local/songs/circuitos.mp3', 'https://images.auramusic.local/albums/electric-delta.png', 2, FALSE, 17590),
-    (5, 3, 5, 3, 'Gravedad Cero', '[VERSO]\n[A]Subo sin mirar\n[F#m]dejo de pesar\n[CORO]\n[D]Gravedad cero\n[E]vuelvo a respirar', 251, 'Indie Rock', 'A', 98, 'https://audio.auramusic.local/songs/gravedad-cero.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 1, FALSE, 8420),
-    (6, 3, 5, 3, 'Mapa Lunar', '[VERSO]\n[C]Trazo una senal\n[Am]sobre el vendaval\n[CORO]\n[F]Mapa lunar\n[G]para regresar', 233, 'Indie Rock', 'C', 92, 'https://audio.auramusic.local/songs/mapa-lunar.mp3', 'https://images.auramusic.local/albums/orbita-interior.png', 2, FALSE, 7630),
-    (7, 4, 6, 4, 'Sol de Enero', '[VERSO]\n[D]Sol de enero\n[Bm]sobre mi piel\n[CORO]\n[G]Canta la raiz\n[A]vuelve a crecer', 207, 'Latin Pop', 'D', 112, 'https://audio.auramusic.local/songs/sol-de-enero.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 1, FALSE, 14320),
-    (8, 4, 6, 4, 'Raiz', '[VERSO]\n[Am]Vengo del sur\n[F]con fuego y luz\n[CORO]\n[C]Raiz de mi voz\n[G]late en tu cancion', 219, 'Soul', 'Am', 86, 'https://audio.auramusic.local/songs/raiz.mp3', 'https://images.auramusic.local/albums/raiz-dorada.png', 2, FALSE, 11110),
-    (9, 5, 7, 5, 'Muelle Fantasma', '[VERSO]\n[Em]Muelle sin final\n[C]barcos al azar\n[CORO]\n[G]Fantasma del mar\n[D]no me dejes atras', 245, 'Alternative', 'Em', 90, 'https://audio.auramusic.local/songs/muelle-fantasma.mp3', 'https://images.auramusic.local/albums/puerto-invisible.png', 1, FALSE, 6510),
-    (10, 6, 8, 6, 'Soft Thunder', '[VERSO]\n[E]Soft thunder rain\n[C#m]falling again\n[CORO]\n[A]Hold the night\n[B]turn on the light', 230, 'Soft Rock', 'E', 96, 'https://audio.auramusic.local/songs/soft-thunder.mp3', 'https://images.auramusic.local/albums/northern-velvet.png', 1, FALSE, 7290),
-    (11, 7, 9, 7, 'Club Solar', '[VERSO]\n[F]Brilla el lugar\n[Dm]no quiero parar\n[CORO]\n[Bb]Club solar\n[C]vamos a bailar', 204, 'Dance Pop', 'F', 124, 'https://audio.auramusic.local/songs/club-solar.mp3', 'https://images.auramusic.local/albums/solar-club.png', 1, FALSE, 18880),
-    (12, 7, 9, 7, 'Verano Digital', '[VERSO]\n[G]Verano digital\n[Em]playa virtual\n[CORO]\n[C]Sube la senal\n[D]no mires atras', 216, 'Dance Pop', 'G', 126, 'https://audio.auramusic.local/songs/verano-digital.mp3', 'https://images.auramusic.local/albums/solar-club.png', 2, FALSE, 15940),
-    (13, 8, 10, 8, 'Flor Nocturna', '[VERSO]\n[Bm]Flor nocturna\n[G]cerca de mi\n[CORO]\n[D]Abre tu luz\n[A]dejame seguir', 260, 'Dream Pop', 'Bm', 80, 'https://audio.auramusic.local/songs/flor-nocturna.mp3', 'https://images.auramusic.local/albums/bloom-after-midnight.png', 1, FALSE, 5330),
-    (14, 9, 11, 9, 'Distrito Bajo', '[VERSO]\n[Cm]Distrito bajo\n[Ab]suena en la estacion\n[CORO]\n[Eb]Sube el bajo\n[Bb]late el corazon', 192, 'Trap', 'Cm', 140, 'https://audio.auramusic.local/songs/distrito-bajo.mp3', 'https://images.auramusic.local/albums/beat-district.png', 1, TRUE, 22100),
-    (15, 10, 12, 10, 'Camino Aurora', '[VERSO]\n[D]Camino aurora\n[G]vuelve a nacer\n[CORO]\n[Bm]Canta la tierra\n[A]al amanecer', 238, 'Folk', 'D', 78, 'https://audio.auramusic.local/songs/camino-aurora.mp3', 'https://images.auramusic.local/albums/campos-aurora.png', 1, FALSE, 6890);
+INSERT INTO songs (id, artist_id, owner_user_id, album, title, lyrics, duration_seconds, genre, original_key, bpm, explicit_content, play_count) VALUES
+    (1, 1, 3, 'Noche Cristal', 'Cristal Azul', '[VERSO]\n[G]Luz sobre el mar\n[Em]brilla al despertar\n[CORO]\n[C]Cristal azul\n[D]me guia tu voz', 214, 'Pop', 'G', 116, FALSE, 12450),
+    (2, 1, 3, 'Noche Cristal', 'Luces en Silencio', '[VERSO]\n[Am]Calles sin final\n[F]luces al pasar\n[CORO]\n[C]Todo vuelve a sonar\n[G]si te quedas aca', 198, 'Pop', 'C', 104, FALSE, 9800),
+    (3, 2, 4, 'Electric Delta', 'Delta Neon', '[INTRO]\n[Dm]Pulso digital\n[Bb]noche artificial\n[CORO]\n[F]Delta neon\n[C]enciende la ciudad', 243, 'Electronica', 'Dm', 128, FALSE, 20230),
+    (4, 2, 4, 'Electric Delta', 'Circuitos', '[VERSO]\n[Em]Corre la senal\n[C]no puedo parar\n[CORO]\n[G]Circuitos de luz\n[D]me llevan a ti', 226, 'Electronica', 'Em', 122, FALSE, 17590),
+    (5, 3, 5, 'Orbita Interior', 'Gravedad Cero', '[VERSO]\n[A]Subo sin mirar\n[F#m]dejo de pesar\n[CORO]\n[D]Gravedad cero\n[E]vuelvo a respirar', 251, 'Indie Rock', 'A', 98, FALSE, 8420),
+    (6, 3, 5, 'Orbita Interior', 'Mapa Lunar', '[VERSO]\n[C]Trazo una senal\n[Am]sobre el vendaval\n[CORO]\n[F]Mapa lunar\n[G]para regresar', 233, 'Indie Rock', 'C', 92, FALSE, 7630),
+    (7, 4, 6, 'Raiz Dorada', 'Sol de Enero', '[VERSO]\n[D]Sol de enero\n[Bm]sobre mi piel\n[CORO]\n[G]Canta la raiz\n[A]vuelve a crecer', 207, 'Latin Pop', 'D', 112, FALSE, 14320),
+    (8, 4, 6, 'Raiz Dorada', 'Raiz', '[VERSO]\n[Am]Vengo del sur\n[F]con fuego y luz\n[CORO]\n[C]Raiz de mi voz\n[G]late en tu cancion', 219, 'Soul', 'Am', 86, FALSE, 11110),
+    (9, 5, 7, 'Puerto Invisible', 'Muelle Fantasma', '[VERSO]\n[Em]Muelle sin final\n[C]barcos al azar\n[CORO]\n[G]Fantasma del mar\n[D]no me dejes atras', 245, 'Alternative', 'Em', 90, FALSE, 6510),
+    (10, 6, 8, 'Northern Velvet', 'Soft Thunder', '[VERSO]\n[E]Soft thunder rain\n[C#m]falling again\n[CORO]\n[A]Hold the night\n[B]turn on the light', 230, 'Soft Rock', 'E', 96, FALSE, 7290),
+    (11, 7, 9, 'Solar Club', 'Club Solar', '[VERSO]\n[F]Brilla el lugar\n[Dm]no quiero parar\n[CORO]\n[Bb]Club solar\n[C]vamos a bailar', 204, 'Dance Pop', 'F', 124, FALSE, 18880),
+    (12, 7, 9, 'Solar Club', 'Verano Digital', '[VERSO]\n[G]Verano digital\n[Em]playa virtual\n[CORO]\n[C]Sube la senal\n[D]no mires atras', 216, 'Dance Pop', 'G', 126, FALSE, 15940),
+    (13, 8, 10, 'Bloom After Midnight', 'Flor Nocturna', '[VERSO]\n[Bm]Flor nocturna\n[G]cerca de mi\n[CORO]\n[D]Abre tu luz\n[A]dejame seguir', 260, 'Dream Pop', 'Bm', 80, FALSE, 5330),
+    (14, 9, 11, 'Beat District', 'Distrito Bajo', '[VERSO]\n[Cm]Distrito bajo\n[Ab]suena en la estacion\n[CORO]\n[Eb]Sube el bajo\n[Bb]late el corazon', 192, 'Trap', 'Cm', 140, TRUE, 22100),
+    (15, 10, 12, 'Campos de Aurora', 'Camino Aurora', '[VERSO]\n[D]Camino aurora\n[G]vuelve a nacer\n[CORO]\n[Bm]Canta la tierra\n[A]al amanecer', 238, 'Folk', 'D', 78, FALSE, 6890);
 
 INSERT INTO playlists (id, user_id, name, description, cover_url, public) VALUES
     (1, 7, 'Dark Glass Coding', 'Musica para programar interfaces de noche.', 'https://images.auramusic.local/playlists/dark-glass-coding.png', TRUE),

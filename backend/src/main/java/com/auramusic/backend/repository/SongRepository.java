@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface SongRepository extends JpaRepository<Song, Long>, JpaSpecificationExecutor<Song> {
     @Override
-    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"artist", "album", "owner"})
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"artist", "owner"})
     Page<Song> findAll(Specification<Song> specification, Pageable pageable);
 
     Page<Song> findByTitleContainingIgnoreCase(String title, Pageable pageable);

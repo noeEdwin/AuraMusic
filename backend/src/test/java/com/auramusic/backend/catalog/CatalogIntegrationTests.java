@@ -83,8 +83,8 @@ class CatalogIntegrationTests {
         seededArtist = artistRepository.findAll().get(0);
 
         jdbcTemplate.update("""
-                INSERT INTO songs (artist_id, title, duration_seconds, genre, audio_url, explicit_content, play_count, created_at, updated_at)
-                VALUES (?, 'Cristal Azul', 214, 'Pop', 'https://audio.example/cristal-azul.mp3', FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                INSERT INTO songs (artist_id, title, duration_seconds, genre, explicit_content, play_count, created_at, updated_at)
+                VALUES (?, 'Cristal Azul', 214, 'Pop', FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """, seededArtist.getId());
     }
 
@@ -125,8 +125,7 @@ class CatalogIntegrationTests {
                                   "artistId": %d,
                                   "title": "Luces Nuevas",
                                   "durationSeconds": 180,
-                                  "genre": "Pop",
-                                  "audioUrl": "https://audio.example/luces-nuevas.mp3"
+                                  "genre": "Pop"
                                 }
                                 """.formatted(seededArtist.getId())))
                 .andExpect(status().isCreated())
@@ -143,14 +142,12 @@ class CatalogIntegrationTests {
                                 {
                                   "artistId": %d,
                                   "title": "",
-                                  "durationSeconds": 0,
-                                  "audioUrl": ""
+                                  "durationSeconds": 0
                                 }
                                 """.formatted(seededArtist.getId())))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.fieldErrors.title").exists())
-                .andExpect(jsonPath("$.fieldErrors.durationSeconds").exists())
-                .andExpect(jsonPath("$.fieldErrors.audioUrl").exists());
+                .andExpect(jsonPath("$.fieldErrors.durationSeconds").exists());
     }
 
     @Test
@@ -178,8 +175,7 @@ class CatalogIntegrationTests {
                                 {
                                   "artistId": %d,
                                   "title": "Cambio no permitido",
-                                  "durationSeconds": 200,
-                                  "audioUrl": "https://audio.example/no-permitido.mp3"
+                                  "durationSeconds": 200
                                 }
                                 """.formatted(seededArtist.getId())))
                 .andExpect(status().isForbidden());
