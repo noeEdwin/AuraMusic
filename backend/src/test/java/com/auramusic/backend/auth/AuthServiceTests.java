@@ -17,6 +17,7 @@ import com.auramusic.backend.domain.entity.PasswordResetToken;
 import com.auramusic.backend.domain.entity.Role;
 import com.auramusic.backend.domain.entity.User;
 import com.auramusic.backend.notification.MailNotificationService;
+import com.auramusic.backend.notification.SmsNotificationService;
 import com.auramusic.backend.repository.PasswordResetTokenRepository;
 import com.auramusic.backend.repository.RevokedTokenRepository;
 import com.auramusic.backend.repository.RoleRepository;
@@ -57,6 +58,9 @@ class AuthServiceTests {
     @Mock
     private MailNotificationService mailNotificationService;
 
+    @Mock
+    private SmsNotificationService smsNotificationService;
+
     private AuthService authService;
 
     @BeforeEach
@@ -69,6 +73,7 @@ class AuthServiceTests {
                 jwtService,
                 passwordResetTokenRepository,
                 mailNotificationService,
+                smsNotificationService,
                 15
         );
     }
@@ -96,6 +101,7 @@ class AuthServiceTests {
         ));
 
         verify(mailNotificationService).sendWelcome(savedUser);
+        verify(smsNotificationService).sendWelcome(savedUser);
     }
 
     @Test

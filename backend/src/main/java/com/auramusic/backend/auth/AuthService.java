@@ -16,6 +16,8 @@ import com.auramusic.backend.repository.RoleRepository;
 import com.auramusic.backend.repository.PasswordResetTokenRepository;
 import com.auramusic.backend.repository.UserRepository;
 import com.auramusic.backend.security.JwtService;
+import com.auramusic.backend.notification.MailNotificationService;
+import com.auramusic.backend.notification.SmsNotificationService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.security.SecureRandom;
@@ -25,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import com.auramusic.backend.notification.MailNotificationService;
 
 @Service
 public class AuthService {
@@ -42,6 +43,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final MailNotificationService mailNotificationService;
+    private final SmsNotificationService smsNotificationService;
     private final long passwordResetExpirationMinutes;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -53,6 +55,7 @@ public class AuthService {
             JwtService jwtService,
             PasswordResetTokenRepository passwordResetTokenRepository,
             MailNotificationService mailNotificationService,
+            SmsNotificationService smsNotificationService,
             @org.springframework.beans.factory.annotation.Value("${auramusic.auth.password-reset-expiration-minutes:15}") long passwordResetExpirationMinutes
     ) {
         this.userRepository = userRepository;
@@ -62,6 +65,7 @@ public class AuthService {
         this.jwtService = jwtService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.mailNotificationService = mailNotificationService;
+        this.smsNotificationService = smsNotificationService;
         this.passwordResetExpirationMinutes = passwordResetExpirationMinutes;
     }
 
@@ -106,6 +110,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
         mailNotificationService.sendWelcome(savedUser);
+        smsNotificationService.sendWelcome(savedUser);
         return createAuthResponse(savedUser);
     }
 
