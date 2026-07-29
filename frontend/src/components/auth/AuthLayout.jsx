@@ -1,4 +1,5 @@
 import './auth.css'
+import logo from '../../assets/logo.png'
 
 export function AuthLayout({ children, footer, heading, subheading, tertiaryText, showLogo = false }) {
   return (
@@ -8,7 +9,7 @@ export function AuthLayout({ children, footer, heading, subheading, tertiaryText
 
       <div className="auth-card">
         <div className={`auth-brand${showLogo ? ' auth-brand-with-logo' : ''}`}>
-          {showLogo ? <div className="brand-mark auth-brand-mark" aria-hidden="true" /> : null}
+          {showLogo ? <img className="auth-brand-mark" src={logo} alt="AuraMusic" /> : null}
           <span className="auth-brand-name">AuraMusic</span>
         </div>
 

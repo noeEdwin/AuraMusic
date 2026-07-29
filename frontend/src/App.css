@@ -40,14 +40,12 @@
   gap: 10px;
 }
 
-.brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(0, 235, 255, 0.9), transparent 28%),
-    radial-gradient(circle at 72% 68%, rgba(176, 130, 255, 0.95), transparent 30%),
-    #121724;
+.sidebar-logo {
+  width: 42px;
+  height: 42px;
+  display: block;
+  object-fit: cover;
+  border-radius: 11px;
   border: 1px solid rgba(190, 167, 255, 0.3);
   box-shadow: 0 10px 24px rgba(74, 47, 140, 0.35);
 }

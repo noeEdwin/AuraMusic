@@ -10,6 +10,7 @@ export function AuthField({
   onBlur,
   onChange,
   placeholder,
+  required = false,
   type = 'text',
   value,
 }) {
@@ -29,6 +30,7 @@ export function AuthField({
           onBlur={onBlur}
           onChange={onChange}
           placeholder={placeholder}
+          required={required}
           type={type}
           value={value}
         />

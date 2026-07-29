@@ -106,7 +106,7 @@ export function LoginView() {
         />
 
         <PasswordField
-          action={<button className="auth-inline-link auth-inline-button" type="button">Olvidaste tu contrasena?</button>}
+          action={<Link className="auth-inline-link" to="/forgot-password">¿Olvidaste tu contraseña?</Link>}
           autoComplete="current-password"
           error={getFieldError('password')}
           label="Contrasena"
@@ -136,9 +136,13 @@ function getLoginFeedbackMessage(locationState, authFeedback) {
     return 'Cuenta creada correctamente. Inicia sesion para continuar.'
   }
 
+  if (locationState?.reset) {
+    return 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.'
+  }
+
   return authFeedback?.message
 }
 
 function getLoginFeedbackTone(locationState, authFeedback) {
-  return locationState?.from || locationState?.registered ? 'info' : authFeedback?.tone
+  return locationState?.from || locationState?.registered || locationState?.reset ? 'info' : authFeedback?.tone
 }

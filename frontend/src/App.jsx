@@ -2,6 +2,8 @@ import './App.css'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginView } from './components/auth/LoginView'
+import { ForgotPasswordView } from './components/auth/ForgotPasswordView'
+import { ResetPasswordView } from './components/auth/ResetPasswordView'
 import { ArtistsCatalogView } from './components/catalog/ArtistsCatalogView'
 import { ArtistSongsView } from './components/catalog/ArtistSongsView'
 import { SongsCatalogView } from './components/catalog/SongsCatalogView'
@@ -36,6 +38,8 @@ function App() {
           </PublicOnlyRoute>
         )}
       />
+      <Route path="/forgot-password" element={<ForgotPasswordView />} />
+      <Route path="/reset-password" element={<ResetPasswordView />} />
       <Route
         path="/dashboard"
         element={(

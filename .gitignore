@@ -4,3 +4,12 @@ PLAN_PROYECTO.md
 PLAN_PROYECTO_DIEGO.md
 AGENTS_DIEGO.md
 temporalpruebas/
+
+# Local environment files may contain credentials.
+.env
+.env.*
+!.env.example
+frontend/.env*
+!frontend/.env.example
+backend/.env*
+!backend/.env.example

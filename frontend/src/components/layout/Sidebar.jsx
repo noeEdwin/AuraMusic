@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
+import logo from '../../assets/logo.png'
 import { navigationItems } from '../../data/dashboardData'
 import { Icon } from '../ui/Icon'
 
@@ -12,7 +13,7 @@ export function Sidebar({ isOpen = false, onNavigate, onToggle }) {
   return (
     <aside className={`sidebar${isOpen ? ' is-open' : ''}`}>
       <div className="sidebar-top">
-        <div className="brand-mark" aria-hidden="true" />
+         <img className="sidebar-logo" src={logo} alt="AuraMusic" />
         <div>
           <p className="brand-name">AuraMusic</p>
         </div>
