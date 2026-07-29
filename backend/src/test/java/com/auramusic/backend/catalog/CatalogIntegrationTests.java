@@ -150,16 +150,16 @@ class CatalogIntegrationTests {
 
     @Test
     @WithMockUser(username = "admin@auramusic.local", roles = "ADMIN")
-    void adminCatalogIsAlsoLimitedToOwnSongsAndBands() throws Exception {
+    void adminCanSeeAllSongsInCatalog() throws Exception {
         mockMvc.perform(get("/api/songs")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[?(@.title == 'Cancion Admin')]").exists())
-                .andExpect(jsonPath("$.content[?(@.title == 'Cristal Azul')]").doesNotExist())
-                .andExpect(jsonPath("$.content[?(@.title == 'Cancion De Banda')]").doesNotExist())
-                .andExpect(jsonPath("$.content[?(@.title == 'Cancion Oculta')]").doesNotExist())
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.content[?(@.title == 'Cristal Azul')]").exists())
+                .andExpect(jsonPath("$.content[?(@.title == 'Cancion De Banda')]").exists())
+                .andExpect(jsonPath("$.content[?(@.title == 'Cancion Oculta')]").exists())
+                .andExpect(jsonPath("$.totalElements").value(4));
     }
 
     @Test

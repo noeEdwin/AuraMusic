@@ -17,6 +17,7 @@ import { TeleprompterView } from './components/teleprompter/TeleprompterView'
 import { SetlistsView } from './components/setlist/SetlistsView'
 import { BandsView } from './components/band/BandsView'
 import { ProfileView } from './components/profile/ProfileView'
+import { useAuth } from './auth/useAuth'
 
 function App() {
   return (
@@ -44,7 +45,7 @@ function App() {
         path="/dashboard"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
-            <DashboardView />
+            <DashboardEntry />
           </ProtectedRoute>
         )}
       />
@@ -135,3 +136,13 @@ function App() {
 }
 
 export default App
+
+function DashboardEntry() {
+  const { role } = useAuth()
+
+  if (role === 'ADMIN') {
+    return <Navigate to="/admin" replace />
+  }
+
+  return <DashboardView />
+}

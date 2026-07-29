@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
+import logo from '../../assets/logo.png'
 import { Icon } from '../ui/Icon'
 import '../profile/profile.css'
 
@@ -15,12 +16,6 @@ export function TopBar({ onMenuToggle, variant = 'default' }) {
   const displayName = user?.displayName ?? 'Invitado'
   const email = user?.email ?? 'sin-correo'
   const role = user?.role ?? 'SIN ROL'
-  const avatarInitials = displayName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('') || 'AM'
   const isCompact = variant === 'compact'
 
   async function handleLogout() {
@@ -67,7 +62,7 @@ export function TopBar({ onMenuToggle, variant = 'default' }) {
              aria-label="Abrir menu de usuario"
              onClick={() => setIsProfileMenuOpen((current) => !current)}
            >
-             {user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : avatarInitials}
+             <img src={user?.avatarUrl ?? logo} alt={user?.avatarUrl ? '' : 'AuraMusic'} />
            </button>
            {isProfileMenuOpen ? (
              <div className="profile-dropdown">

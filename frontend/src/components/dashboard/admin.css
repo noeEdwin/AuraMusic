@@ -1,0 +1,157 @@
+.admin-grid {
+  grid-template-columns: 1fr;
+}
+
+.admin-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-hero h1 {
+  margin: 14px 0 10px;
+}
+
+.admin-hero p,
+.admin-security-card p:last-child {
+  color: #aeb4c8;
+}
+
+.admin-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(24, 232, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(24, 232, 255, 0.08);
+  color: #9df7ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-stat-card,
+.admin-info-card {
+  border: 1px solid rgba(191, 198, 255, 0.09);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.admin-stat-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.admin-stat-card span {
+  color: #8d94a9;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-stat-card strong {
+  color: #f5f7ff;
+  font-size: 1.8rem;
+}
+
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-info-card {
+  padding: 20px;
+}
+
+.admin-info-card h2 {
+  margin: 0 0 18px;
+  color: #f5f7ff;
+}
+
+.admin-detail-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.admin-detail-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(191, 198, 255, 0.07);
+}
+
+.admin-detail-list dt {
+  color: #858ba0;
+}
+
+.admin-detail-list dd {
+  margin: 0;
+  color: #edf0ff;
+  text-align: right;
+}
+
+.admin-security-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.admin-security-card h2 {
+  margin-bottom: 4px;
+}
+
+.admin-status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dce1f3;
+}
+
+.admin-status-line .status-dot {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+  .admin-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-hero,
+  .admin-content-grid {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .admin-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-detail-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-detail-list dd {
+    text-align: left;
+  }
+}

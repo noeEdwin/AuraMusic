@@ -1,5 +1,5 @@
 export const navigationItems = [
-  { label: 'Pagina principal', icon: 'grid', path: '/dashboard' },
+  { label: 'Pagina principal', icon: 'grid', path: '/dashboard', roles: ['MUSICIAN', 'SOLO'] },
   { label: 'Panel admin', icon: 'shield', path: '/admin', roles: ['ADMIN'] },
   { label: 'Canciones', icon: 'note', path: '/songs' },
   { label: 'Artistas', icon: 'user', path: '/artists' },

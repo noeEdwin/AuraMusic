@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { readLocalAvatar } from '../../auth/localAvatarStorage'
+import logo from '../../assets/logo.png'
 import { getApiErrorMessage } from '../../lib/api'
 import { confirmAction } from '../../lib/confirmAction'
 import { AppShellLayout } from '../layout/AppShellLayout'
@@ -90,7 +91,7 @@ export function ProfileView() {
             <p>Actualiza los datos que se muestran en tu cuenta sin cambiar tu rol ni tu nombre de usuario.</p>
           </div>
           <div className="profile-page-avatar">
-            {localAvatar ? <img src={localAvatar} alt="Vista previa del perfil" /> : getInitials(form.displayName)}
+            <img src={localAvatar ?? logo} alt={localAvatar ? 'Vista previa del perfil' : 'AuraMusic'} />
           </div>
         </div>
 
@@ -129,10 +130,6 @@ export function ProfileView() {
       </section>
     </AppShellLayout>
   )
-}
-
-function getInitials(value = '') {
-  return value.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'AM'
 }
 
 function formatRole(role) {

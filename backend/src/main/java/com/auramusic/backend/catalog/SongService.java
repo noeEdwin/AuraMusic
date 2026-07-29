@@ -59,7 +59,9 @@ public class SongService {
     ) {
         User user = findUser(email);
         Specification<Song> specification = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
-        specification = specification.and(SongSpecifications.ownerIn(findVisibleOwnerIds(user)));
+        if (!isAdmin(user)) {
+            specification = specification.and(SongSpecifications.ownerIn(findVisibleOwnerIds(user)));
+        }
         if (hasText(title)) {
             specification = specification.and(SongSpecifications.titleContains(title));
         }
@@ -148,7 +150,7 @@ public class SongService {
     }
 
     private void assertCanView(Song song, User user) {
-        if (song.getOwner() != null && findVisibleOwnerIds(user).contains(song.getOwner().getId())) {
+        if (isAdmin(user) || (song.getOwner() != null && findVisibleOwnerIds(user).contains(song.getOwner().getId()))) {
             return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para ver esta cancion");
