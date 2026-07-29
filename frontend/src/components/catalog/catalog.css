@@ -39,6 +39,8 @@
 
 .catalog-filters {
   display: grid;
+  align-self: start;
+  align-content: start;
   gap: 16px;
   padding: 18px;
   border-radius: 16px;
@@ -49,7 +51,13 @@
 .catalog-filter-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
   gap: 14px;
+}
+
+.catalog-search-filter-grid,
+.songs-filter-grid {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .catalog-field {
@@ -67,6 +75,8 @@
 
 .catalog-field input,
 .catalog-field select {
+  box-sizing: border-box;
+  height: 46px;
   min-height: 46px;
   border: 1px solid rgba(191, 198, 255, 0.08);
   border-radius: 12px;
@@ -79,6 +89,19 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.catalog-filter-actions-inline {
+  align-items: end;
+  align-self: end;
+  flex-wrap: nowrap;
+  height: 46px;
+}
+
+.catalog-filter-actions-inline .catalog-submit,
+.catalog-filter-actions-inline .catalog-clear {
+  height: 46px;
+  white-space: nowrap;
 }
 
 .catalog-submit,
@@ -158,6 +181,11 @@
   grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.2fr) 120px;
 }
 
+.artist-songs-list-head,
+.artist-songs-list-row {
+  grid-template-columns: minmax(160px, 1.3fr) minmax(120px, 0.85fr) minmax(130px, 0.8fr) minmax(70px, 0.42fr) minmax(64px, 0.38fr) minmax(82px, 0.5fr) minmax(80px, 0.45fr);
+}
+
 .catalog-primary-cell,
 .catalog-cell {
   min-width: 0;
@@ -187,6 +215,17 @@
 
 .catalog-song-link:hover {
   color: #11ebff;
+}
+
+.catalog-back-link {
+  color: #11ebff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.catalog-back-link:hover {
+  color: #9df7ff;
 }
 
 .catalog-primary-cell span,
@@ -341,11 +380,13 @@
   }
 
 .songs-list-head,
+  .artist-songs-list-head,
   .artists-list-head {
     display: none;
   }
 
 .songs-list-row,
+  .artist-songs-list-row,
   .artists-list-row {
     grid-template-columns: 1fr 1fr;
     align-items: start;
@@ -385,6 +426,10 @@
     grid-template-columns: 1fr;
   }
 
+.catalog-filter-actions-inline {
+    height: auto;
+  }
+
 .catalog-submit,
   .catalog-clear,
   .catalog-page-button,
@@ -406,6 +451,7 @@
 @media (max-width: 520px) {
 .songs-row,
   .songs-list-row,
+  .artist-songs-list-row,
   .artists-list-row {
     grid-template-columns: 1fr;
   }

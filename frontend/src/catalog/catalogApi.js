@@ -27,6 +27,11 @@ export async function fetchArtistsCatalog({ page, size, name }) {
   return data
 }
 
+export async function fetchArtistById(artistId) {
+  const { data } = await api.get(`/api/artists/${artistId}`)
+  return data
+}
+
 export async function createArtist(payload) {
   const { data } = await api.post('/api/artists', payload)
   return data

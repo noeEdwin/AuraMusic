@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { fetchArtistsCatalog, fetchSongsCatalog } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
@@ -19,6 +20,21 @@ export function ArtistsCatalogView() {
   const [isLoading, setIsLoading] = useState(true)
 
   const artists = useMemo(() => catalog?.content ?? [], [catalog])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setPage(0)
+      setFilters((current) => {
+        if (current.name === draftFilters.name) {
+          return current
+        }
+
+        return draftFilters
+      })
+    }, 350)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [draftFilters])
 
   useEffect(() => {
     let ignore = false
@@ -125,20 +141,20 @@ export function ArtistsCatalogView() {
         </div>
 
         <form className="catalog-filters" onSubmit={handleFilterSubmit}>
-          <div className="catalog-filter-grid">
+          <div className="catalog-filter-grid catalog-search-filter-grid">
             <label className="catalog-field">
               <span>Nombre</span>
               <input name="name" value={draftFilters.name} onChange={handleDraftChange} placeholder="Ej. Luna" />
             </label>
-          </div>
 
-          <div className="catalog-filter-actions">
-            <button className="catalog-submit" type="submit" disabled={isLoading}>
-              {isLoading ? 'Buscando...' : 'Aplicar filtros'}
-            </button>
-            <button className="catalog-clear" type="button" onClick={handleClearFilters} disabled={isLoading}>
-              Limpiar
-            </button>
+            <div className="catalog-filter-actions catalog-filter-actions-inline">
+              <button className="catalog-submit" type="submit" disabled={isLoading}>
+                {isLoading ? 'Buscando...' : 'Buscar ahora'}
+              </button>
+              <button className="catalog-clear" type="button" onClick={handleClearFilters} disabled={isLoading}>
+                Limpiar
+              </button>
+            </div>
           </div>
         </form>
 
@@ -161,7 +177,9 @@ export function ArtistsCatalogView() {
             {artists.map((artist) => (
               <article key={artist.id} className="catalog-list-row artists-list-row" role="row">
                 <div className="catalog-primary-cell" data-label="Artista">
-                  <strong>{artist.name}</strong>
+                  <Link className="catalog-song-link" to={`/artists/${artist.id}`}>
+                    {artist.name}
+                  </Link>
                   <span>{artist.imageUrl ? 'Imagen disponible' : 'Sin imagen'}</span>
                 </div>
                 <div className="catalog-cell catalog-copy" data-label="Biografia">{artist.bio || 'Sin biografia registrada todavia.'}</div>

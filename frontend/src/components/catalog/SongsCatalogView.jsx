@@ -28,8 +28,8 @@ const EMPTY_ARTIST_FORM = {
 
 export function SongsCatalogView() {
   const { role, user } = useAuth()
-  const [filters, setFilters] = useState({ title: '', genre: '' })
-  const [draftFilters, setDraftFilters] = useState({ title: '', genre: '' })
+  const [filters, setFilters] = useState({ title: '' })
+  const [draftFilters, setDraftFilters] = useState({ title: '' })
   const [page, setPage] = useState(0)
   const [catalog, setCatalog] = useState(null)
   const [artists, setArtists] = useState([])
@@ -81,7 +81,6 @@ export function SongsCatalogView() {
           page,
           size: PAGE_SIZE,
           title: filters.title.trim(),
-          genre: filters.genre.trim(),
         })
 
         if (!ignore) {
@@ -110,7 +109,7 @@ export function SongsCatalogView() {
     const timeoutId = window.setTimeout(() => {
       setPage(0)
       setFilters((current) => {
-        if (current.title === draftFilters.title && current.genre === draftFilters.genre) {
+        if (current.title === draftFilters.title) {
           return current
         }
 
@@ -133,7 +132,7 @@ export function SongsCatalogView() {
   }
 
   function handleClearFilters() {
-    const clearedFilters = { title: '', genre: '' }
+    const clearedFilters = { title: '' }
     setDraftFilters(clearedFilters)
     setFilters(clearedFilters)
     setPage(0)
@@ -255,25 +254,20 @@ export function SongsCatalogView() {
         </div>
 
         <form className="catalog-filters" onSubmit={handleFilterSubmit}>
-          <div className="catalog-filter-grid">
+          <div className="catalog-filter-grid songs-filter-grid">
             <label className="catalog-field">
               <span>Titulo</span>
               <input name="title" value={draftFilters.title} onChange={handleDraftChange} placeholder="Ej. Kumbala" />
             </label>
 
-            <label className="catalog-field">
-              <span>Genero</span>
-              <input name="genre" value={draftFilters.genre} onChange={handleDraftChange} placeholder="Ej. Rock" />
-            </label>
-          </div>
-
-          <div className="catalog-filter-actions">
-            <button className="catalog-submit" type="submit" disabled={isLoading}>
-              {isLoading ? 'Buscando...' : 'Buscar ahora'}
-            </button>
-            <button className="catalog-clear" type="button" onClick={handleClearFilters} disabled={isLoading}>
-              Limpiar
-            </button>
+            <div className="catalog-filter-actions catalog-filter-actions-inline">
+              <button className="catalog-submit" type="submit" disabled={isLoading}>
+                {isLoading ? 'Buscando...' : 'Buscar ahora'}
+              </button>
+              <button className="catalog-clear" type="button" onClick={handleClearFilters} disabled={isLoading}>
+                Limpiar
+              </button>
+            </div>
           </div>
         </form>
 
@@ -388,7 +382,7 @@ export function SongsCatalogView() {
           </form>
         ) : null}
 
-        {isLoading ? <div className="catalog-empty">Cargando canciones desde el servidor...</div> : null}
+        {isLoading && !catalog ? <div className="catalog-empty">Cargando canciones desde el servidor...</div> : null}
 
         {!isLoading && !error && songs.length === 0 ? (
           <div className="catalog-empty">No se encontraron canciones con los filtros actuales.</div>
