@@ -13,12 +13,14 @@ public record SetlistResponse(
         UserSummary owner,
         Long bandId,
         List<SetlistItemResponse> items,
-        int totalDurationSeconds
+        int totalDurationSeconds,
+        SetlistMetricsResponse metrics
 ) {
     public static SetlistResponse from(
             Setlist setlist,
             List<SetlistItemResponse> items,
-            int totalDurationSeconds
+            int totalDurationSeconds,
+            SetlistMetricsResponse metrics
     ) {
         return new SetlistResponse(
                 setlist.getId(),
@@ -28,7 +30,8 @@ public record SetlistResponse(
                 UserSummary.from(setlist.getOwner()),
                 setlist.getBand() == null ? null : setlist.getBand().getId(),
                 items,
-                totalDurationSeconds
+                totalDurationSeconds,
+                metrics
         );
     }
 }

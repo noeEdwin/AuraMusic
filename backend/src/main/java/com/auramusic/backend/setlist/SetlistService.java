@@ -16,14 +16,18 @@ import com.auramusic.backend.setlist.dto.AddSetlistItemRequest;
 import com.auramusic.backend.setlist.dto.DuplicateSetlistRequest;
 import com.auramusic.backend.setlist.dto.ReorderSetlistRequest;
 import com.auramusic.backend.setlist.dto.SetlistItemResponse;
+import com.auramusic.backend.setlist.dto.SetlistMetricsResponse;
 import com.auramusic.backend.setlist.dto.SetlistResponse;
 import com.auramusic.backend.setlist.dto.UpdateSetlistItemRequest;
 import com.auramusic.backend.setlist.dto.UpdateSetlistRequest;
 import com.auramusic.backend.setlist.dto.CreateSetlistRequest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,7 +246,32 @@ public class SetlistService {
         int total = items.stream()
                 .mapToInt(item -> item.song().durationSeconds() + item.breakSeconds())
                 .sum();
-        return SetlistResponse.from(setlist, items, total);
+        return SetlistResponse.from(setlist, items, total, calculateMetrics(items));
+    }
+
+    private SetlistMetricsResponse calculateMetrics(List<SetlistItemResponse> items) {
+        List<Integer> bpms = items.stream()
+                .map(item -> item.song().bpm())
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        Integer averageBpm = bpms.isEmpty()
+                ? null
+                : (int) Math.round(bpms.stream().mapToInt(Integer::intValue).average().orElse(0));
+
+        Map<String, Integer> keyDistribution = new TreeMap<>();
+        items.stream()
+                .map(item -> item.song().originalKey())
+                .filter(key -> key != null && !key.isBlank())
+                .map(String::trim)
+                .forEach(key -> keyDistribution.merge(key, 1, Integer::sum));
+        String dominantKey = keyDistribution.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+
+        return new SetlistMetricsResponse(averageBpm, dominantKey, keyDistribution);
     }
 
     private void shiftPositions(List<SetlistItem> items, int position) {

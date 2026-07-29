@@ -75,8 +75,8 @@ class SetlistIntegrationTests {
 
         jdbcTemplate.update("INSERT INTO artists (name, created_at, updated_at) VALUES ('Test Artist', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
         Long artistId = jdbcTemplate.queryForObject("SELECT id FROM artists WHERE name = 'Test Artist'", Long.class);
-        insertSong(artistId, "Song One", 180);
-        insertSong(artistId, "Song Two", 240);
+        insertSong(artistId, "Song One", 180, 100, "C");
+        insertSong(artistId, "Song Two", 240, 140, "G");
         firstSong = songRepository.findAll().stream().filter(song -> song.getTitle().equals("Song One")).findFirst().orElseThrow();
         secondSong = songRepository.findAll().stream().filter(song -> song.getTitle().equals("Song Two")).findFirst().orElseThrow();
 
@@ -112,6 +112,9 @@ class SetlistIntegrationTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Set de prueba"))
                 .andExpect(jsonPath("$.totalDurationSeconds").value(0))
+                .andExpect(jsonPath("$.metrics.averageBpm").isEmpty())
+                .andExpect(jsonPath("$.metrics.dominantKey").isEmpty())
+                .andExpect(jsonPath("$.metrics.keyDistribution").isEmpty())
                 .andExpect(jsonPath("$.owner.username").value("owner"));
     }
 
@@ -131,13 +134,49 @@ class SetlistIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"songId\":%d,\"breakSeconds\":10}".formatted(firstSong.getId())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalDurationSeconds").value(190));
+                .andExpect(jsonPath("$.totalDurationSeconds").value(190))
+                .andExpect(jsonPath("$.metrics.averageBpm").value(100))
+                .andExpect(jsonPath("$.metrics.dominantKey").value("C"))
+                .andExpect(jsonPath("$.metrics.keyDistribution.C").value(1));
 
         mockMvc.perform(post("/api/setlists/{id}/items", setlistId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"songId\":%d,\"breakSeconds\":5}".formatted(secondSong.getId())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalDurationSeconds").value(435));
+                .andExpect(jsonPath("$.totalDurationSeconds").value(435))
+                .andExpect(jsonPath("$.metrics.averageBpm").value(120))
+                .andExpect(jsonPath("$.metrics.dominantKey").value("C"))
+                .andExpect(jsonPath("$.metrics.keyDistribution.C").value(1))
+                .andExpect(jsonPath("$.metrics.keyDistribution.G").value(1));
+    }
+
+    @Test
+    @WithMockUser(username = "owner@auramusic.local", roles = "MUSICIAN")
+    void metricsIgnoreSongsWithoutBpmOrKey() throws Exception {
+        secondSong.setBpm(null);
+        secondSong.setOriginalKey(" ");
+        songRepository.saveAndFlush(secondSong);
+
+        mockMvc.perform(post("/api/setlists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Partial Metrics Set\"}"))
+                .andExpect(status().isCreated());
+        Long setlistId = setlistRepository.findByOwnerId(
+                userRepository.findByEmail("owner@auramusic.local").orElseThrow().getId()
+        ).stream().filter(setlist -> setlist.getName().equals("Partial Metrics Set")).findFirst().orElseThrow().getId();
+
+        mockMvc.perform(post("/api/setlists/{id}/items", setlistId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"songId\":%d}".formatted(firstSong.getId())))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/setlists/{id}/items", setlistId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"songId\":%d}".formatted(secondSong.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metrics.averageBpm").value(100))
+                .andExpect(jsonPath("$.metrics.dominantKey").value("C"))
+                .andExpect(jsonPath("$.metrics.keyDistribution.C").value(1))
+                .andExpect(jsonPath("$.metrics.keyDistribution.*").value(org.hamcrest.Matchers.hasSize(1)));
     }
 
     @Test
@@ -252,10 +291,10 @@ class SetlistIntegrationTests {
                 """, roleId, username, email, username);
     }
 
-    private void insertSong(Long artistId, String title, int duration) {
+    private void insertSong(Long artistId, String title, int duration, int bpm, String originalKey) {
         jdbcTemplate.update("""
-                INSERT INTO songs (artist_id, title, duration_seconds, genre, explicit_content, play_count, created_at, updated_at)
-                VALUES (?, ?, ?, 'Pop', FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                """, artistId, title, duration);
+                INSERT INTO songs (artist_id, title, duration_seconds, genre, original_key, bpm, explicit_content, play_count, created_at, updated_at)
+                VALUES (?, ?, ?, 'Pop', ?, ?, FALSE, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, artistId, title, duration, originalKey, bpm);
     }
 }

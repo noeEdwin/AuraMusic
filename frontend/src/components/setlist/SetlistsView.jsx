@@ -239,7 +239,7 @@ function SetlistBuilderView({ setlistId }) {
   async function removeSong(itemId) {
     try {
       await removeSetlistItem(setlistId, itemId)
-      setSetlist((current) => ({ ...current, items: current.items.filter((item) => item.id !== itemId) }))
+      setSetlist(await fetchSetlist(setlistId))
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, 'No fue posible quitar la cancion.'))
     }
@@ -348,7 +348,7 @@ function SetlistBuilderView({ setlistId }) {
           ) : <aside className="builder-library"><p className="catalog-copy">Setlist compartido por tu banda. Puedes unirte a la sesion en vivo sin editarlo.</p></aside>}
         </div>
 
-        <div className="builder-summary"><div><span>Canciones</span><strong>{setlist.items?.length ?? 0}</strong></div><div><span>BPM promedio</span><strong>{averageBpm(setlist.items)}</strong></div><div><span>Tonalidad</span><strong>{setlist.items?.map((item) => item.song?.originalKey).filter(Boolean).join(' / ') || 'N/D'}</strong></div></div>
+        <div className="builder-summary"><div><span>Canciones</span><strong>{setlist.items?.length ?? 0}</strong></div><div><span>BPM promedio</span><strong>{setlist.metrics?.averageBpm ?? 'N/D'}</strong></div><div><span>Tonalidad dominante</span><strong>{setlist.metrics?.dominantKey ?? 'N/D'}</strong></div></div>
       </section>
     </AppShellLayout>
   )
@@ -372,11 +372,6 @@ function canManageSetlist(setlist, bands, user, role, memberRole = null) {
 function formatDuration(seconds) {
   const total = Number(seconds ?? 0)
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
-}
-
-function averageBpm(items = []) {
-  const bpms = items.map((item) => item.song?.bpm).filter(Boolean)
-  return bpms.length ? Math.round(bpms.reduce((sum, bpm) => sum + bpm, 0) / bpms.length) : 'N/D'
 }
 
 function getSetlistStartLabel(bandId, memberRole) {
