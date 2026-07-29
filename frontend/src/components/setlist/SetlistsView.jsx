@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/useAuth'
 import { fetchBands } from '../../bands/bandsApi'
 import { fetchSongsCatalog } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import {
   addSetlistItem,
   createSetlist,
@@ -37,7 +38,6 @@ function SetlistsListView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [draft, setDraft] = useState({ name: '', description: '', eventDate: '', bandId: '' })
   const [deletingId, setDeletingId] = useState(null)
-  const [pendingDelete, setPendingDelete] = useState(null)
 
   useEffect(() => {
     let ignore = false
@@ -82,17 +82,19 @@ function SetlistsListView() {
   }
 
   async function handleDelete(setlist) {
-    if (pendingDelete?.id !== setlist.id) {
-      setPendingDelete(setlist)
-      return
-    }
+    const shouldDelete = await confirmAction({
+      title: '¿Eliminar setlist?',
+      text: `El setlist "${setlist.name}" y su organización se eliminarán.`,
+      confirmText: 'Eliminar setlist',
+    })
+
+    if (!shouldDelete) return
 
     setDeletingId(setlist.id)
     setError('')
     try {
       await deleteSetlist(setlist.id)
       setSetlists((current) => current.filter((item) => item.id !== setlist.id))
-      setPendingDelete(null)
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, 'No fue posible eliminar el setlist.'))
     } finally {
@@ -144,9 +146,8 @@ function SetlistsListView() {
                 {canManageSetlist(setlist, bands, user, role) ? (
                   <div className="setlist-summary-actions">
                     <button className="catalog-danger-button" type="button" onClick={() => handleDelete(setlist)} disabled={deletingId === setlist.id}>
-                      {deletingId === setlist.id ? 'Eliminando...' : pendingDelete?.id === setlist.id ? 'Confirmar' : 'Eliminar'}
+                      {deletingId === setlist.id ? 'Eliminando...' : 'Eliminar'}
                     </button>
-                    {pendingDelete?.id === setlist.id ? <button className="catalog-clear" type="button" onClick={() => setPendingDelete(null)}>Cancelar</button> : null}
                   </div>
                 ) : <span className="catalog-local-tag">Compartido</span>}
               </article>
@@ -215,6 +216,15 @@ function SetlistBuilderView({ setlistId }) {
 
   async function saveDetails(event) {
     event.preventDefault()
+    const shouldSave = await confirmAction({
+      title: '¿Guardar cambios?',
+      text: 'Se actualizará la información de este setlist.',
+      confirmText: 'Guardar cambios',
+      icon: 'question',
+    })
+
+    if (!shouldSave) return
+
     setIsSaving(true)
     try {
       const updated = await updateSetlist(setlistId, { ...draft, eventDate: draft.eventDate || null })
@@ -237,6 +247,15 @@ function SetlistBuilderView({ setlistId }) {
   }
 
   async function removeSong(itemId) {
+    const item = setlist?.items?.find((currentItem) => currentItem.id === itemId)
+    const shouldRemove = await confirmAction({
+      title: '¿Quitar canción?',
+      text: `Se quitará "${item?.song?.title ?? 'esta canción'}" del setlist.`,
+      confirmText: 'Quitar canción',
+    })
+
+    if (!shouldRemove) return
+
     try {
       await removeSetlistItem(setlistId, itemId)
       setSetlist(await fetchSetlist(setlistId))
@@ -252,7 +271,17 @@ function SetlistBuilderView({ setlistId }) {
     const toIndex = items.findIndex((item) => item.id === targetId)
     const [moved] = items.splice(fromIndex, 1)
     items.splice(toIndex, 0, moved)
+
+    const shouldReorder = await confirmAction({
+      title: '¿Cambiar orden?',
+      text: 'Se actualizará el orden de las canciones en este setlist.',
+      confirmText: 'Cambiar orden',
+      icon: 'question',
+    })
+
     setDraggedItemId(null)
+    if (!shouldReorder) return
+
     try {
       const updated = await reorderSetlistItems(setlistId, items.map((item) => item.id))
       setSetlist(updated)

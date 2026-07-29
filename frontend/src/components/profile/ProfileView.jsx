@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { readLocalAvatar } from '../../auth/localAvatarStorage'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import './profile.css'
@@ -50,6 +51,15 @@ export function ProfileView() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    const shouldSave = await confirmAction({
+      title: '¿Guardar cambios del perfil?',
+      text: 'Se actualizarán los datos visibles de tu cuenta.',
+      confirmText: 'Guardar cambios',
+      icon: 'question',
+    })
+
+    if (!shouldSave) return
+
     setIsSaving(true)
     setError('')
     setMessage('')

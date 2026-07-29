@@ -407,16 +407,21 @@
   }
 
 .topbar-compact {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
 
 .topbar-compact .topbar-meta {
+    grid-column: 2;
     width: auto;
     margin-left: auto;
     justify-content: flex-end;
-  }
+    flex-wrap: nowrap;
+    align-items: center;
+}
 }
 
 @media (max-width: 720px) {
