@@ -1,0 +1,30 @@
+meta {
+  name: Update profile
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/api/auth/profile
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "email": "{{resetEmail}}",
+    "phone": "+529518695421",
+    "displayName": "Perfil AuraMusic",
+    "avatarUrl": "{{profileAvatarUrl}}"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("token", data.token);
+}
