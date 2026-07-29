@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/useAuth'
 import { fetchBands } from '../../bands/bandsApi'
 import { fetchSongsCatalog } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import {
   addSetlistItem,
   createSetlist,
@@ -37,7 +38,6 @@ function SetlistsListView() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [draft, setDraft] = useState({ name: '', description: '', eventDate: '', bandId: '' })
   const [deletingId, setDeletingId] = useState(null)
-  const [pendingDelete, setPendingDelete] = useState(null)
 
   useEffect(() => {
     let ignore = false
@@ -82,17 +82,19 @@ function SetlistsListView() {
   }
 
   async function handleDelete(setlist) {
-    if (pendingDelete?.id !== setlist.id) {
-      setPendingDelete(setlist)
-      return
-    }
+    const shouldDelete = await confirmAction({
+      title: '¿Eliminar setlist?',
+      text: `El setlist "${setlist.name}" y su organización se eliminarán.`,
+      confirmText: 'Eliminar setlist',
+    })
+
+    if (!shouldDelete) return
 
     setDeletingId(setlist.id)
     setError('')
     try {
       await deleteSetlist(setlist.id)
       setSetlists((current) => current.filter((item) => item.id !== setlist.id))
-      setPendingDelete(null)
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, 'No fue posible eliminar el setlist.'))
     } finally {
@@ -144,9 +146,8 @@ function SetlistsListView() {
                 {canManageSetlist(setlist, bands, user, role) ? (
                   <div className="setlist-summary-actions">
                     <button className="catalog-danger-button" type="button" onClick={() => handleDelete(setlist)} disabled={deletingId === setlist.id}>
-                      {deletingId === setlist.id ? 'Eliminando...' : pendingDelete?.id === setlist.id ? 'Confirmar' : 'Eliminar'}
+                      {deletingId === setlist.id ? 'Eliminando...' : 'Eliminar'}
                     </button>
-                    {pendingDelete?.id === setlist.id ? <button className="catalog-clear" type="button" onClick={() => setPendingDelete(null)}>Cancelar</button> : null}
                   </div>
                 ) : <span className="catalog-local-tag">Compartido</span>}
               </article>
@@ -215,6 +216,15 @@ function SetlistBuilderView({ setlistId }) {
 
   async function saveDetails(event) {
     event.preventDefault()
+    const shouldSave = await confirmAction({
+      title: '¿Guardar cambios?',
+      text: 'Se actualizará la información de este setlist.',
+      confirmText: 'Guardar cambios',
+      icon: 'question',
+    })
+
+    if (!shouldSave) return
+
     setIsSaving(true)
     try {
       const updated = await updateSetlist(setlistId, { ...draft, eventDate: draft.eventDate || null })
@@ -237,6 +247,15 @@ function SetlistBuilderView({ setlistId }) {
   }
 
   async function removeSong(itemId) {
+    const item = setlist?.items?.find((currentItem) => currentItem.id === itemId)
+    const shouldRemove = await confirmAction({
+      title: '¿Quitar canción?',
+      text: `Se quitará "${item?.song?.title ?? 'esta canción'}" del setlist.`,
+      confirmText: 'Quitar canción',
+    })
+
+    if (!shouldRemove) return
+
     try {
       await removeSetlistItem(setlistId, itemId)
       setSetlist((current) => ({ ...current, items: current.items.filter((item) => item.id !== itemId) }))
@@ -252,7 +271,17 @@ function SetlistBuilderView({ setlistId }) {
     const toIndex = items.findIndex((item) => item.id === targetId)
     const [moved] = items.splice(fromIndex, 1)
     items.splice(toIndex, 0, moved)
+
+    const shouldReorder = await confirmAction({
+      title: '¿Cambiar orden?',
+      text: 'Se actualizará el orden de las canciones en este setlist.',
+      confirmText: 'Cambiar orden',
+      icon: 'question',
+    })
+
     setDraggedItemId(null)
+    if (!shouldReorder) return
+
     try {
       const updated = await reorderSetlistItems(setlistId, items.map((item) => item.id))
       setSetlist(updated)
@@ -336,19 +365,20 @@ function SetlistBuilderView({ setlistId }) {
             </div>
           </div>
 
-          {canManageCurrentSetlist ? (
-            <aside className="builder-library">
-              <div className="builder-library-header"><div><p className="eyebrow">Libreria</p><h2>Agregar canciones</h2></div><span>{availableSongs.length}</span></div>
-              <label className="searchbar builder-search"><Icon type="search" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar canciones..." /></label>
-              <div className="builder-library-list">
-                {availableSongs.map((song) => <button className="builder-library-song" type="button" key={song.id} onClick={() => addSong(song)}><span><strong>{song.title}</strong><small>{song.artist?.name ?? 'Artista sin asignar'} · {song.bpm ?? 'N/D'} BPM</small></span><span className="builder-add-icon">+</span></button>)}
-                {availableSongs.length === 0 ? <p className="catalog-copy">No hay canciones disponibles.</p> : null}
-              </div>
-            </aside>
-          ) : <aside className="builder-library"><p className="catalog-copy">Setlist compartido por tu banda. Puedes unirte a la sesion en vivo sin editarlo.</p></aside>}
         </div>
 
         <div className="builder-summary"><div><span>Canciones</span><strong>{setlist.items?.length ?? 0}</strong></div><div><span>BPM promedio</span><strong>{averageBpm(setlist.items)}</strong></div><div><span>Tonalidad</span><strong>{setlist.items?.map((item) => item.song?.originalKey).filter(Boolean).join(' / ') || 'N/D'}</strong></div></div>
+
+        {canManageCurrentSetlist ? (
+          <aside className="builder-library">
+            <div className="builder-library-header"><div><p className="eyebrow">Libreria</p><h2>Agregar canciones</h2></div><span>{availableSongs.length}</span></div>
+            <label className="searchbar builder-search"><Icon type="search" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar canciones..." /></label>
+            <div className="builder-library-list">
+              {availableSongs.map((song) => <button className="builder-library-song" type="button" key={song.id} onClick={() => addSong(song)}><span><strong>{song.title}</strong><small>{song.artist?.name ?? 'Artista sin asignar'} · {song.bpm ?? 'N/D'} BPM</small></span><span className="builder-add-icon">+</span></button>)}
+              {availableSongs.length === 0 ? <p className="catalog-copy">No hay canciones disponibles.</p> : null}
+            </div>
+          </aside>
+        ) : <aside className="builder-library"><p className="catalog-copy">Setlist compartido por tu banda. Puedes unirte a la sesion en vivo sin editarlo.</p></aside>}
       </section>
     </AppShellLayout>
   )

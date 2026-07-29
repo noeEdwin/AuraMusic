@@ -313,7 +313,16 @@
 }
 
 .teleprompter-segment.chord-only {
+  display: block;
   margin-right: clamp(14px, 1.6vw, 24px);
+}
+
+.teleprompter-segment.chord-only .teleprompter-lyric {
+  display: none;
+}
+
+.teleprompter-segment.chord-only:has(+ .teleprompter-segment.has-chord) {
+  margin-right: 0.25em;
 }
 
 .teleprompter-chord {

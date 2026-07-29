@@ -86,7 +86,7 @@ function parseChordLine(line, transposeSteps) {
       if (lyricBuffer || activeChord) {
         segments.push({
           chord: activeChord ? transposeChord(activeChord, transposeSteps) : null,
-          lyric: lyricBuffer,
+          lyric: lyricBuffer.trim() ? lyricBuffer : '',
         })
       }
 
@@ -105,7 +105,7 @@ function parseChordLine(line, transposeSteps) {
   if (lyricBuffer || activeChord) {
     segments.push({
       chord: activeChord ? transposeChord(activeChord, transposeSteps) : null,
-      lyric: lyricBuffer,
+      lyric: lyricBuffer.trim() ? lyricBuffer : '',
     })
   }
 

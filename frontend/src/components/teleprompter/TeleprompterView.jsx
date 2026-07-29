@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { fetchSongsCatalog, updateSong } from '../../catalog/catalogApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import { createLiveSessionClient } from '../../live/liveSessionClient'
 import { fetchSetlist } from '../../setlists/setlistsApi'
 import { parseTeleprompterSections } from '../../teleprompter/teleprompterParser'
@@ -320,6 +321,15 @@ export function TeleprompterView() {
       return
     }
 
+    const shouldSave = await confirmAction({
+      title: '¿Guardar letra y acordes?',
+      text: `Se actualizará la canción "${selectedSong.title}" en el catálogo.`,
+      confirmText: 'Guardar cambios',
+      icon: 'question',
+    })
+
+    if (!shouldSave) return
+
     setIsSavingLyrics(true)
     setSaveError('')
     setSaveMessage('')
@@ -452,7 +462,7 @@ export function TeleprompterView() {
                         return (
                           <div key={`${section.label}-line-${lineIndex}`} className="teleprompter-line">
                             {line.segments.map((segment, segmentIndex) => (
-                              <div key={`${section.label}-segment-${lineIndex}-${segmentIndex}`} className={`teleprompter-segment${segment.chord && !segment.lyric ? ' chord-only' : ''}`}>
+                              <div key={`${section.label}-segment-${lineIndex}-${segmentIndex}`} className={`teleprompter-segment${segment.chord ? ' has-chord' : ''}${segment.chord && !segment.lyric ? ' chord-only' : ''}`}>
                                 <span className="teleprompter-chord">{segment.chord ?? '\u00A0'}</span>
                                 <span className="teleprompter-lyric">{segment.lyric || '\u00A0'}</span>
                               </div>

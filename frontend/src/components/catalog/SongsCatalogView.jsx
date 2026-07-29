@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { createArtist, createSong, deleteSong, fetchArtistsCatalog, fetchSongsCatalog } from '../../catalog/catalogApi'
 import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import { CatalogPagination } from './CatalogPagination'
@@ -213,7 +214,11 @@ export function SongsCatalogView() {
       return
     }
 
-    const shouldDelete = window.confirm(`Eliminar "${song.title}" del catalogo?`)
+    const shouldDelete = await confirmAction({
+      title: '¿Eliminar canción?',
+      text: `La canción "${song.title}" se eliminará del catálogo. Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar canción',
+    })
 
     if (!shouldDelete) {
       return

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { resetPassword } from '../../auth/passwordRecoveryApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { confirmAction } from '../../lib/confirmAction'
 import { StatusBanner } from '../shared/StatusBanner'
 import { AuthLayout } from './AuthLayout'
 import { PasswordField } from './PasswordField'
@@ -37,6 +38,15 @@ export function ResetPasswordView() {
       setError('Las contraseñas no coinciden.')
       return
     }
+
+    const shouldReset = await confirmAction({
+      title: '¿Cambiar contraseña?',
+      text: 'Tu contraseña actual dejará de funcionar después de este cambio.',
+      confirmText: 'Cambiar contraseña',
+      icon: 'question',
+    })
+
+    if (!shouldReset) return
 
     setIsSubmitting(true)
 

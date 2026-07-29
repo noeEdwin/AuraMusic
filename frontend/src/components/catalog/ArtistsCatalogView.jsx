@@ -180,7 +180,6 @@ export function ArtistsCatalogView() {
                   <Link className="catalog-song-link" to={`/artists/${artist.id}`}>
                     {artist.name}
                   </Link>
-                  <span>{artist.imageUrl ? 'Imagen disponible' : 'Sin imagen'}</span>
                 </div>
                 <div className="catalog-cell catalog-copy" data-label="Biografia">{artist.bio || 'Sin biografia registrada todavia.'}</div>
                 <div className="catalog-cell" data-label="Canciones">{formatSongTotal(songTotalsByArtist[artist.id])}</div>
