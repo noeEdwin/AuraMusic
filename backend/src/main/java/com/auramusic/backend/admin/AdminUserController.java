@@ -3,9 +3,11 @@ package com.auramusic.backend.admin;
 import com.auramusic.backend.admin.dto.AdminUserResponse;
 import com.auramusic.backend.admin.dto.UpdateAdminUserRequest;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,12 +25,22 @@ public class AdminUserController {
         this.adminUserService = adminUserService;
     }
 
+    @GetMapping
+    public List<AdminUserResponse> list() {
+        return adminUserService.list();
+    }
+
     @PutMapping("/{id}")
     public AdminUserResponse update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateAdminUserRequest request
     ) {
         return adminUserService.update(id, request);
+    }
+
+    @PutMapping("/{id}/activate")
+    public AdminUserResponse activate(@PathVariable Long id) {
+        return adminUserService.activate(id);
     }
 
     @DeleteMapping("/{id}")

@@ -78,6 +78,10 @@
   padding: 20px;
 }
 
+.admin-control-card {
+  grid-column: 1 / -1;
+}
+
 .admin-info-card h2 {
   margin: 0 0 18px;
   color: #f5f7ff;
@@ -117,6 +121,84 @@
   margin-bottom: 4px;
 }
 
+.admin-user-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-user-summary-grid article {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(191, 198, 255, 0.07);
+}
+
+.admin-user-summary-grid span,
+.admin-users-help-copy {
+  color: #aeb4c8;
+}
+
+.admin-user-summary-grid span {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-user-summary-grid strong {
+  color: #f5f7ff;
+  font-size: 1.5rem;
+}
+
+.admin-users-list-head,
+.admin-users-list-row {
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(110px, 0.55fr) minmax(110px, 0.5fr) minmax(180px, 0.95fr);
+}
+
+.admin-users-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 107, 129, 0.1);
+  border: 1px solid rgba(255, 107, 129, 0.18);
+  color: #ffb7c2;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.admin-status-pill.active {
+  background: rgba(24, 232, 255, 0.08);
+  border-color: rgba(24, 232, 255, 0.18);
+  color: #9df7ff;
+}
+
+.catalog-activate-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(24, 232, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(24, 232, 255, 0.08);
+  color: #9df7ff;
+  font-weight: 700;
+}
+
+.catalog-activate-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin-status-line {
   display: flex;
   align-items: center;
@@ -132,6 +214,11 @@
   .admin-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .admin-users-list-head,
+  .admin-users-list-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -142,6 +229,10 @@
   }
 
   .admin-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-summary-grid {
     grid-template-columns: 1fr;
   }
 

@@ -18,7 +18,6 @@ export function BandsView() {
   const [bands, setBands] = useState([])
   const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM)
   const [joinForm, setJoinForm] = useState(EMPTY_JOIN_FORM)
-  const [copiedBandId, setCopiedBandId] = useState(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -110,19 +109,6 @@ export function BandsView() {
     }
   }
 
-  async function handleCopyInviteLink(band) {
-    setError('')
-    setMessage('')
-
-    try {
-      await navigator.clipboard.writeText(buildInviteLink(band.inviteCode))
-      setCopiedBandId(band.id)
-      setMessage(`Enlace de invitacion copiado para ${band.name}.`)
-    } catch {
-      setError('No fue posible copiar el enlace. Copia el codigo manualmente.')
-    }
-  }
-
   return (
     <AppShellLayout contentClassName="content-grid catalog-grid">
       <section className="panel page-panel catalog-panel">
@@ -153,7 +139,7 @@ export function BandsView() {
           <form className="song-artist-form" onSubmit={handleJoin}>
             <p className="eyebrow">Invitacion</p>
             <h2>Unirse a una banda</h2>
-            <label className="catalog-field"><span>Codigo de invitacion</span><input name="inviteCode" value={joinForm.inviteCode} onChange={handleJoinChange} required placeholder="Pega aqui tu codigo o abre un enlace" /></label>
+            <label className="catalog-field"><span>Codigo de invitacion</span><input name="inviteCode" value={joinForm.inviteCode} onChange={handleJoinChange} required placeholder="Escribe el codigo de invitacion" /></label>
             <label className="catalog-field"><span>Instrumento</span><input name="instrument" value={joinForm.instrument} onChange={handleJoinChange} required maxLength={80} placeholder="Bajo" /></label>
             <button className="catalog-submit" type="submit" disabled={isSaving}>{isSaving ? 'Uniendo...' : 'Unirme'}</button>
           </form>
@@ -169,13 +155,6 @@ export function BandsView() {
                 <div className="catalog-cell catalog-copy">{band.description || 'Sin descripcion.'}</div>
                 <div className="catalog-cell">{band.members?.length ?? 0} integrantes</div>
                 <div className="catalog-cell"><strong>{band.leader?.id === user?.id ? 'Líder' : 'Integrante'}</strong><span>Codigo: {band.inviteCode}</span></div>
-                {band.leader?.id === user?.id && band.inviteCode ? (
-                  <div className="catalog-cell catalog-actions-cell">
-                    <button className="catalog-clear" type="button" onClick={() => handleCopyInviteLink(band)}>
-                      {copiedBandId === band.id ? 'Enlace copiado' : 'Copiar enlace'}
-                    </button>
-                  </div>
-                ) : null}
               </article>
             ))}
           </div>
@@ -183,8 +162,4 @@ export function BandsView() {
       </section>
     </AppShellLayout>
   )
-}
-
-function buildInviteLink(inviteCode) {
-  return `${window.location.origin}/bands/join?code=${encodeURIComponent(inviteCode)}`
 }

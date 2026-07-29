@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { useAuth } from '../../auth/useAuth'
 import { fetchAdminSummary } from '../../admin/adminApi'
 import { fetchArtistsCatalog, fetchSongsCatalog } from '../../catalog/catalogApi'
 import { fetchBands } from '../../bands/bandsApi'
 import { fetchSetlists } from '../../setlists/setlistsApi'
 import { getApiErrorMessage } from '../../lib/api'
+import { useAuth } from '../../auth/useAuth'
 import { AppShellLayout } from '../layout/AppShellLayout'
 import { StatusBanner } from '../shared/StatusBanner'
 import '../setlist/setlists.css'
@@ -70,7 +70,7 @@ export function AdminView() {
         </div>
 
         <div className="admin-content-grid">
-          <section className="admin-info-card">
+          <section className="admin-info-card admin-control-card">
             <p className="eyebrow">Identidad de control</p>
             <h2>{user?.displayName ?? user?.username}</h2>
             <dl className="admin-detail-list">
@@ -80,7 +80,6 @@ export function AdminView() {
               <div><dt>Nivel de acceso</dt><dd>Administrador principal</dd></div>
             </dl>
           </section>
-
         </div>
       </section>
     </AppShellLayout>

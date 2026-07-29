@@ -115,6 +115,21 @@ class AdminUserIntegrationTests {
     }
 
     @Test
+    @WithMockUser(username = "admin@auramusic.local", roles = "ADMIN")
+    void adminCanActivateDeactivatedUser() throws Exception {
+        musician.setEnabled(false);
+        userRepository.save(musician);
+
+        mockMvc.perform(put("/api/admin/users/{id}/activate", musician.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(musician.getId()))
+                .andExpect(jsonPath("$.enabled").value(true));
+
+        User activated = userRepository.findById(musician.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertTrue(activated.getEnabled());
+    }
+
+    @Test
     @WithMockUser(username = "musician@auramusic.local", roles = "MUSICIAN")
     void nonAdminCannotUpdateOrDeactivateUsers() throws Exception {
         mockMvc.perform(put("/api/admin/users/{id}", admin.getId())
@@ -130,6 +145,9 @@ class AdminUserIntegrationTests {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(delete("/api/admin/users/{id}", admin.getId()))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(put("/api/admin/users/{id}/activate", admin.getId()))
                 .andExpect(status().isForbidden());
     }
 

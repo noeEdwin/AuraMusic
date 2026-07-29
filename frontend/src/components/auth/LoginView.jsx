@@ -77,7 +77,7 @@ export function LoginView() {
     <AuthLayout
       showLogo
       heading="Bienvenido"
-      subheading=""
+      subheading="Por favor ingresa tus credenciales"
       footer={(
         <p>
           <span>Aun no tienes cuenta? </span>
@@ -128,9 +128,6 @@ export function LoginView() {
 }
 
 function getLoginFeedbackMessage(locationState, authFeedback) {
-  if (locationState?.from) {
-    return 'Inicia sesion para continuar'
-  }
 
   if (locationState?.registered) {
     return 'Cuenta creada correctamente. Inicia sesion para continuar.'

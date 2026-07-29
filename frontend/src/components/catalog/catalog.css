@@ -187,7 +187,7 @@
 }
 
 .bands-list-row {
-  grid-template-columns: minmax(160px, 1fr) minmax(0, 1.1fr) minmax(90px, 0.45fr) minmax(130px, 0.62fr) auto;
+  grid-template-columns: minmax(160px, 1fr) minmax(0, 1.1fr) minmax(90px, 0.45fr) minmax(130px, 0.62fr);
 }
 
 .catalog-primary-cell,

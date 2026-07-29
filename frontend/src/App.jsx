@@ -9,6 +9,7 @@ import { ArtistSongsView } from './components/catalog/ArtistSongsView'
 import { SongsCatalogView } from './components/catalog/SongsCatalogView'
 import { RegisterView } from './components/auth/RegisterView'
 import { AdminView } from './components/dashboard/AdminView'
+import { AdminUsersView } from './components/dashboard/AdminUsersView'
 import { DashboardView } from './components/dashboard/DashboardView'
 import { ProtectedRoute } from './components/routing/ProtectedRoute'
 import { PublicOnlyRoute } from './components/routing/PublicOnlyRoute'
@@ -126,6 +127,14 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/admin/users"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminUsersView />
           </ProtectedRoute>
         )}
       />

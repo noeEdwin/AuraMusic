@@ -15,6 +15,48 @@
   color: #aeb4c8;
 }
 
+.auramusic-alert-form-container {
+  color: #aeb4c8;
+}
+
+.auramusic-alert-form {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.auramusic-alert-form label {
+  display: grid;
+  gap: 6px;
+  color: #aeb4c8;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.auramusic-alert-input {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid rgba(191, 198, 255, 0.12);
+  border-radius: 10px;
+  outline: 0;
+  background: rgba(8, 10, 18, 0.72);
+  color: #edf0ff;
+  font: inherit;
+}
+
+.auramusic-alert-input:focus {
+  border-color: rgba(24, 232, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(24, 232, 255, 0.1);
+}
+
+.auramusic-alert-form-container .swal2-validation-message {
+  margin: 14px 0 0;
+  background: rgba(255, 107, 129, 0.1);
+  color: #ffb7c2;
+}
+
 .auramusic-alert-confirm,
 .auramusic-alert-cancel {
   min-height: 42px;

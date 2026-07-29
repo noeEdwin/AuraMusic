@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
-import logo from '../../assets/logo.png'
 import { Icon } from '../ui/Icon'
+import { AvatarImage } from '../shared/AvatarImage'
 import '../profile/profile.css'
 
 export function TopBar({ onMenuToggle, variant = 'default' }) {
@@ -62,7 +62,7 @@ export function TopBar({ onMenuToggle, variant = 'default' }) {
              aria-label="Abrir menu de usuario"
              onClick={() => setIsProfileMenuOpen((current) => !current)}
            >
-             <img src={user?.avatarUrl ?? logo} alt={user?.avatarUrl ? '' : 'AuraMusic'} />
+              <AvatarImage src={user?.avatarUrl} alt="Foto de perfil" />
            </button>
            {isProfileMenuOpen ? (
              <div className="profile-dropdown">

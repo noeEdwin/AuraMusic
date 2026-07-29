@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { readLocalAvatar } from '../../auth/localAvatarStorage'
-import logo from '../../assets/logo.png'
 import { getApiErrorMessage } from '../../lib/api'
 import { confirmAction } from '../../lib/confirmAction'
 import { AppShellLayout } from '../layout/AppShellLayout'
+import { AvatarImage } from '../shared/AvatarImage'
 import { StatusBanner } from '../shared/StatusBanner'
 import './profile.css'
 
@@ -91,7 +91,7 @@ export function ProfileView() {
             <p>Actualiza los datos que se muestran en tu cuenta sin cambiar tu rol ni tu nombre de usuario.</p>
           </div>
           <div className="profile-page-avatar">
-            <img src={localAvatar ?? logo} alt={localAvatar ? 'Vista previa del perfil' : 'AuraMusic'} />
+            <AvatarImage src={localAvatar ?? user?.avatarUrl} alt="Foto de perfil" />
           </div>
         </div>
 

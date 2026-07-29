@@ -3,6 +3,7 @@ package com.auramusic.backend.admin;
 import com.auramusic.backend.admin.dto.AdminUserResponse;
 import com.auramusic.backend.admin.dto.UpdateAdminUserRequest;
 import com.auramusic.backend.domain.entity.User;
+import java.util.List;
 import com.auramusic.backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,13 @@ public class AdminUserService {
 
     public AdminUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminUserResponse> list() {
+        return userRepository.findAllByOrderByIdDesc().stream()
+                .map(AdminUserResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -36,6 +44,13 @@ public class AdminUserService {
         user.setPhone(normalize(request.phone()));
         user.setDisplayName(request.displayName().trim());
         user.setAvatarUrl(normalize(request.avatarUrl()));
+        return AdminUserResponse.from(userRepository.save(user));
+    }
+
+    @Transactional
+    public AdminUserResponse activate(Long id) {
+        User user = findUser(id);
+        user.setEnabled(true);
         return AdminUserResponse.from(userRepository.save(user));
     }
 
