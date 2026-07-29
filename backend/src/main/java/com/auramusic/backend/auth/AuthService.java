@@ -4,6 +4,7 @@ import com.auramusic.backend.auth.dto.AuthResponse;
 import com.auramusic.backend.auth.dto.CurrentUserResponse;
 import com.auramusic.backend.auth.dto.LoginRequest;
 import com.auramusic.backend.auth.dto.RegisterRequest;
+import com.auramusic.backend.auth.dto.UpdateProfileRequest;
 import com.auramusic.backend.domain.entity.RevokedToken;
 import com.auramusic.backend.domain.entity.Role;
 import com.auramusic.backend.domain.entity.User;
@@ -98,6 +99,25 @@ public class AuthService {
     }
 
     @Transactional
+    public AuthResponse updateProfile(UpdateProfileRequest request, String currentEmail, String currentToken) {
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado"));
+        String email = request.email().trim().toLowerCase();
+
+        if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmailAndIdNot(email, user.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya esta registrado");
+        }
+
+        user.setEmail(email);
+        user.setPhone(normalize(request.phone()));
+        user.setDisplayName(request.displayName().trim());
+        user.setAvatarUrl(normalize(request.avatarUrl()));
+        User savedUser = userRepository.save(user);
+        logout(currentToken);
+        return createAuthResponse(savedUser);
+    }
+
+    @Transactional
     public void logout(String token) {
         String tokenHash = jwtService.hashToken(token);
         if (revokedTokenRepository.existsByTokenHash(tokenHash)) {
@@ -113,5 +133,9 @@ public class AuthService {
     private AuthResponse createAuthResponse(User user) {
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, TOKEN_TYPE, jwtService.getExpirationMs(), CurrentUserResponse.from(user));
+    }
+
+    private String normalize(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }

@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { Icon } from '../ui/Icon'
+import '../profile/profile.css'
 
 export function TopBar({ onMenuToggle, variant = 'default' }) {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
 
   const displayName = user?.displayName ?? 'Invitado'
   const email = user?.email ?? 'sin-correo'
@@ -58,8 +60,28 @@ export function TopBar({ onMenuToggle, variant = 'default' }) {
             <p className="profile-name">{displayName}</p>
             <p className="profile-email">{email}</p>
           </div>
-          <div className="profile-avatar">{avatarInitials}</div>
-        </div>
+           <button
+             className="profile-avatar-button"
+             type="button"
+             aria-expanded={isProfileMenuOpen}
+             aria-label="Abrir menu de usuario"
+             onClick={() => setIsProfileMenuOpen((current) => !current)}
+           >
+             {user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : avatarInitials}
+           </button>
+           {isProfileMenuOpen ? (
+             <div className="profile-dropdown">
+               <div className="profile-dropdown-heading">
+                 <strong>{displayName}</strong>
+                 <span>{email}</span>
+               </div>
+               <button className="profile-dropdown-item" type="button" onClick={() => { setIsProfileMenuOpen(false); navigate('/profile') }}>
+                 <Icon type="gear" />
+                 <span>Configuración</span>
+               </button>
+             </div>
+           ) : null}
+         </div>
 
         <button className="logout-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
           <Icon type="logout" />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { api, setApiToken } from '../lib/api'
+import { applyLocalAvatar, writeLocalAvatar } from './localAvatarStorage'
 import { AuthContext } from './authContextValue'
 import { readStoredSession, writeStoredSession } from './authStorage'
 
@@ -30,7 +31,7 @@ export function AuthProvider({ children }) {
         const { data } = await api.get('/api/auth/me')
 
         if (!ignore) {
-          setSession((current) => (current ? { ...current, user: data } : null))
+           setSession((current) => (current ? { ...current, user: applyLocalAvatar(data) } : null))
         }
       } catch {
         if (!ignore) {
@@ -61,7 +62,7 @@ export function AuthProvider({ children }) {
   async function login(credentials) {
     clearAuthFeedback()
     const { data } = await api.post('/api/auth/login', credentials)
-    setSession(data)
+    setSession({ ...data, user: applyLocalAvatar(data.user) })
     return data
   }
 
@@ -69,6 +70,18 @@ export function AuthProvider({ children }) {
     clearAuthFeedback()
     const { data } = await api.post('/api/auth/register', payload)
     return data
+  }
+
+  async function updateProfile(payload) {
+    const { data } = await api.put('/api/auth/profile', payload)
+    setSession(data)
+    return data
+  }
+
+  function updateLocalAvatar(dataUrl) {
+    if (!session?.user) return
+    writeLocalAvatar(session.user, dataUrl)
+    setSession((current) => current ? { ...current, user: { ...current.user, avatarUrl: dataUrl || null } } : null)
   }
 
   async function logout() {
@@ -95,6 +108,8 @@ export function AuthProvider({ children }) {
     login,
     logout,
     register,
+    updateProfile,
+    updateLocalAvatar,
     role: session?.user?.role ?? null,
     session,
     token: session?.token ?? null,

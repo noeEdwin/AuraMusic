@@ -14,6 +14,7 @@ import { UnauthorizedView } from './components/shared/UnauthorizedView'
 import { TeleprompterView } from './components/teleprompter/TeleprompterView'
 import { SetlistsView } from './components/setlist/SetlistsView'
 import { BandsView } from './components/band/BandsView'
+import { ProfileView } from './components/profile/ProfileView'
 
 function App() {
   return (
@@ -40,6 +41,14 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <DashboardView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <ProfileView />
           </ProtectedRoute>
         )}
       />
