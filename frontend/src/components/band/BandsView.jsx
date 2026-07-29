@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { createBand, fetchBands, joinBand } from '../../bands/bandsApi'
 import { useAuth } from '../../auth/useAuth'
@@ -12,13 +13,18 @@ const EMPTY_JOIN_FORM = { inviteCode: '', instrument: '' }
 
 export function BandsView() {
   const { role, user } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [bands, setBands] = useState([])
   const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM)
   const [joinForm, setJoinForm] = useState(EMPTY_JOIN_FORM)
+  const [copiedBandId, setCopiedBandId] = useState(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+
+  const inviteCodeFromUrl = searchParams.get('code')?.trim() ?? ''
 
   useEffect(() => {
     let ignore = false
@@ -37,6 +43,15 @@ export function BandsView() {
     void loadBands()
     return () => { ignore = true }
   }, [])
+
+  useEffect(() => {
+    if (!inviteCodeFromUrl) {
+      return
+    }
+
+    setJoinForm((current) => current.inviteCode === inviteCodeFromUrl ? current : { ...current, inviteCode: inviteCodeFromUrl })
+    setMessage('Codigo de invitacion detectado. Solo agrega tu instrumento para unirte.')
+  }, [inviteCodeFromUrl])
 
   function handleCreateChange(event) {
     const { name, value } = event.target
@@ -85,10 +100,26 @@ export function BandsView() {
       setBands(data)
       setJoinForm(EMPTY_JOIN_FORM)
       setMessage('Te has unido a la banda.')
+      if (inviteCodeFromUrl) {
+        navigate('/bands', { replace: true })
+      }
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, 'No fue posible unirte a la banda.'))
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  async function handleCopyInviteLink(band) {
+    setError('')
+    setMessage('')
+
+    try {
+      await navigator.clipboard.writeText(buildInviteLink(band.inviteCode))
+      setCopiedBandId(band.id)
+      setMessage(`Enlace de invitacion copiado para ${band.name}.`)
+    } catch {
+      setError('No fue posible copiar el enlace. Copia el codigo manualmente.')
     }
   }
 
@@ -122,7 +153,7 @@ export function BandsView() {
           <form className="song-artist-form" onSubmit={handleJoin}>
             <p className="eyebrow">Invitacion</p>
             <h2>Unirse a una banda</h2>
-            <label className="catalog-field"><span>Codigo de invitacion</span><input name="inviteCode" value={joinForm.inviteCode} onChange={handleJoinChange} required /></label>
+            <label className="catalog-field"><span>Codigo de invitacion</span><input name="inviteCode" value={joinForm.inviteCode} onChange={handleJoinChange} required placeholder="Pega aqui tu codigo o abre un enlace" /></label>
             <label className="catalog-field"><span>Instrumento</span><input name="instrument" value={joinForm.instrument} onChange={handleJoinChange} required maxLength={80} placeholder="Bajo" /></label>
             <button className="catalog-submit" type="submit" disabled={isSaving}>{isSaving ? 'Uniendo...' : 'Unirme'}</button>
           </form>
@@ -133,11 +164,18 @@ export function BandsView() {
         {!isLoading && bands.length > 0 ? (
           <div className="catalog-list-shell" role="list" aria-label="Mis bandas">
             {bands.map((band) => (
-              <article className="catalog-list-row" key={band.id} role="listitem">
-                <div className="catalog-primary-cell"><strong>{band.name}</strong><span>Lider: {band.leader?.displayName ?? 'Sin nombre'}</span></div>
+              <article className="catalog-list-row bands-list-row" key={band.id} role="listitem">
+                <div className="catalog-primary-cell"><strong>{band.name}</strong><span>Líder: {band.leader?.displayName ?? 'Sin nombre'}</span></div>
                 <div className="catalog-cell catalog-copy">{band.description || 'Sin descripcion.'}</div>
                 <div className="catalog-cell">{band.members?.length ?? 0} integrantes</div>
-                <div className="catalog-cell"><strong>{band.leader?.id === user?.id ? 'Lider' : 'Integrante'}</strong><span>Codigo: {band.inviteCode}</span></div>
+                <div className="catalog-cell"><strong>{band.leader?.id === user?.id ? 'Líder' : 'Integrante'}</strong><span>Codigo: {band.inviteCode}</span></div>
+                {band.leader?.id === user?.id && band.inviteCode ? (
+                  <div className="catalog-cell catalog-actions-cell">
+                    <button className="catalog-clear" type="button" onClick={() => handleCopyInviteLink(band)}>
+                      {copiedBandId === band.id ? 'Enlace copiado' : 'Copiar enlace'}
+                    </button>
+                  </div>
+                ) : null}
               </article>
             ))}
           </div>
@@ -145,4 +183,8 @@ export function BandsView() {
       </section>
     </AppShellLayout>
   )
+}
+
+function buildInviteLink(inviteCode) {
+  return `${window.location.origin}/bands/join?code=${encodeURIComponent(inviteCode)}`
 }

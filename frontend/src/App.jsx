@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { LoginView } from './components/auth/LoginView'
 import { ArtistsCatalogView } from './components/catalog/ArtistsCatalogView'
+import { ArtistSongsView } from './components/catalog/ArtistSongsView'
 import { SongsCatalogView } from './components/catalog/SongsCatalogView'
 import { RegisterView } from './components/auth/RegisterView'
 import { AdminView } from './components/dashboard/AdminView'
@@ -13,6 +14,7 @@ import { UnauthorizedView } from './components/shared/UnauthorizedView'
 import { TeleprompterView } from './components/teleprompter/TeleprompterView'
 import { SetlistsView } from './components/setlist/SetlistsView'
 import { BandsView } from './components/band/BandsView'
+import { ProfileView } from './components/profile/ProfileView'
 
 function App() {
   return (
@@ -43,6 +45,14 @@ function App() {
         )}
       />
       <Route
+        path="/profile"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <ProfileView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
         path="/songs"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
@@ -55,6 +65,14 @@ function App() {
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <ArtistsCatalogView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/artists/:artistId"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <ArtistSongsView />
           </ProtectedRoute>
         )}
       />
@@ -76,6 +94,14 @@ function App() {
       />
       <Route
         path="/bands"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <BandsView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/bands/join"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
             <BandsView />

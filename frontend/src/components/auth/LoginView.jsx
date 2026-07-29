@@ -81,7 +81,7 @@ export function LoginView() {
       footer={(
         <p>
           <span>Aun no tienes cuenta? </span>
-          <Link to="/register">Registrate</Link>
+          <Link to="/register" state={{ from: location.state?.from }}>Registrate</Link>
         </p>
       )}
     >

@@ -270,10 +270,11 @@ public class SetlistService {
 
     private void assertCanManage(Setlist setlist, User user) {
         if (isAdmin(user) || setlist.getOwner().getId().equals(user.getId())
-                || (setlist.getBand() != null && setlist.getBand().getLeader().getId().equals(user.getId()))) {
+                || (setlist.getBand() != null
+                && bandMemberRepository.existsByBandIdAndUserId(setlist.getBand().getId(), user.getId()))) {
             return;
         }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este setlist");
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Debes pertenecer a la banda para modificar este setlist");
     }
 
     private void assertBandMember(Band band, User user) {

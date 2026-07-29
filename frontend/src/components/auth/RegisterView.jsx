@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/useAuth'
 import { getApiErrorMessage } from '../../lib/api'
@@ -11,6 +11,7 @@ import { PasswordField } from './PasswordField'
 import { getPasswordStrength, validateRegister } from './authValidation'
 
 export function RegisterView() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { authFeedback, clearAuthFeedback, register } = useAuth()
   const [values, setValues] = useState({
@@ -79,6 +80,7 @@ export function RegisterView() {
         state: {
           registered: true,
           email: values.email.trim().toLowerCase(),
+          from: location.state?.from,
         },
       })
     } catch (error) {
@@ -99,7 +101,7 @@ export function RegisterView() {
       footer={(
         <p>
           <span>Ya tienes cuenta? </span>
-          <Link to="/login">Inicia sesion</Link>
+          <Link to="/login" state={{ from: location.state?.from }}>Inicia sesion</Link>
         </p>
       )}
     >

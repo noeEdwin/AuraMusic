@@ -45,7 +45,7 @@ export function TeleprompterView() {
   const liveMemberRole = searchParams.get('memberRole')
   const shouldStartSession = searchParams.get('startSession') === 'true'
   const isLiveMode = Boolean(bandId && setlistId)
-  const canControlLiveSession = liveMemberRole === 'LEADER'
+  const canControlLiveSession = Boolean(liveMemberRole)
 
   useEffect(() => {
     let ignore = false

@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class LiveSessionService {
 
-    private static final String LEADER = "LEADER";
-
     private final ConcurrentMap<Long, LiveSessionState> sessions = new ConcurrentHashMap<>();
     private final UserRepository userRepository;
     private final BandMemberRepository bandMemberRepository;
@@ -36,7 +34,10 @@ public class LiveSessionService {
         }
 
         if ("START_SESSION".equals(type)) {
-            requireLeader(member);
+            LiveSessionState current = sessions.get(bandId);
+            if (current != null && current.active()) {
+                return current;
+            }
             LiveSessionState state = new LiveSessionState(
                     bandId,
                     true,
@@ -52,7 +53,6 @@ public class LiveSessionService {
 
         LiveSessionState current = sessions.get(bandId);
         if ("CLOSE_SESSION".equals(type)) {
-            requireLeader(member);
             LiveSessionState closed = current == null
                     ? LiveSessionState.inactive(bandId)
                     : new LiveSessionState(bandId, false, current.setlistId(), current.activeItemId(), false,
@@ -61,7 +61,6 @@ public class LiveSessionService {
             return closed;
         }
 
-        requireLeader(member);
         if (current == null || !current.active()) {
             throw new MessagingException("La sesion de la banda no esta activa");
         }
@@ -94,12 +93,6 @@ public class LiveSessionService {
                 .orElseThrow(() -> new MessagingException("Usuario no encontrado"));
         return bandMemberRepository.findByBandIdAndUserId(bandId, user.getId())
                 .orElseThrow(() -> new MessagingException("El usuario no pertenece a la banda"));
-    }
-
-    private void requireLeader(BandMember member) {
-        if (!LEADER.equalsIgnoreCase(member.getMemberRole())) {
-            throw new MessagingException("Solo el lider puede modificar la sesion");
-        }
     }
 
     private String normalizeType(String type) {

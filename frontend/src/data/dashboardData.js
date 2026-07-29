@@ -5,7 +5,6 @@ export const navigationItems = [
   { label: 'Artistas', icon: 'user', path: '/artists' },
   { label: 'SetLists', icon: 'list', path: '/setlists' },
   { label: 'Bandas', icon: 'user', path: '/bands' },
-  { label: 'Configuracion', icon: 'gear' },
 ]
 
 export const members = [

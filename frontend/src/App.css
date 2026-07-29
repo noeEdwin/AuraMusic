@@ -207,6 +207,7 @@
 }
 
 .profile-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -228,7 +229,8 @@
   color: #8a8fa5;
 }
 
-.profile-avatar {
+.profile-avatar,
+.profile-avatar-button {
   width: 44px;
   height: 44px;
   display: grid;
@@ -242,6 +244,23 @@
   font-size: 0.82rem;
   font-weight: 700;
   box-shadow: 0 12px 26px rgba(39, 24, 80, 0.44);
+}
+
+.profile-avatar-button {
+  flex: 0 0 44px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  padding: 0;
+  color: #f0f2ff;
+  cursor: pointer;
+}
+
+.profile-avatar-button img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .logout-button {
@@ -435,10 +454,12 @@
     display: none;
   }
 
-.topbar-compact .profile-avatar {
-    width: 38px;
-    height: 38px;
-  }
+ .topbar-compact .profile-avatar,
+   .topbar-compact .profile-avatar-button {
+     flex-basis: 38px;
+     width: 38px;
+     height: 38px;
+   }
 
 .topbar-compact .logout-button {
     width: 38px;

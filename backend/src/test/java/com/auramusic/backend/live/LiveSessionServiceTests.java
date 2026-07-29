@@ -61,7 +61,7 @@ class LiveSessionServiceTests {
     }
 
     @Test
-    void memberCanSynchronizeButCannotChangeSession() {
+    void memberCanSynchronizeAndControlSession() {
         User leader = user(11L, "leader@auramusic.local");
         User member = user(12L, "member@auramusic.local");
         when(userRepository.findByEmail(leader.getEmail())).thenReturn(Optional.of(leader));
@@ -79,11 +79,39 @@ class LiveSessionServiceTests {
         );
 
         assertTrue(synchronizedState.active());
-        assertThrows(MessagingException.class, () -> service.handle(
+        LiveSessionState paused = service.handle(
                 BAND_ID,
                 new LiveSessionCommand("PAUSE", null, null, null),
                 member.getEmail()
-        ));
+        );
+
+        assertFalse(paused.playing());
+    }
+
+    @Test
+    void memberCanStartAndLeaderCanJoinWithoutResettingSession() {
+        User leader = user(11L, "leader@auramusic.local");
+        User member = user(12L, "member@auramusic.local");
+        when(userRepository.findByEmail(leader.getEmail())).thenReturn(Optional.of(leader));
+        when(userRepository.findByEmail(member.getEmail())).thenReturn(Optional.of(member));
+        when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, leader.getId()))
+                .thenReturn(Optional.of(member("LEADER")));
+        when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, member.getId()))
+                .thenReturn(Optional.of(member("MEMBER")));
+
+        LiveSessionState started = service.handle(
+                BAND_ID,
+                new LiveSessionCommand("START_SESSION", 9L, 21L, null),
+                member.getEmail()
+        );
+        LiveSessionState joined = service.handle(
+                BAND_ID,
+                new LiveSessionCommand("START_SESSION", 99L, 99L, null),
+                leader.getEmail()
+        );
+
+        assertEquals(9L, started.setlistId());
+        assertEquals(21L, joined.activeItemId());
     }
 
     @Test

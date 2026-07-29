@@ -2,6 +2,7 @@ package com.auramusic.backend.setlist;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -69,6 +70,7 @@ class SetlistIntegrationTests {
         jdbcTemplate.update("INSERT INTO roles (name, description, created_at) VALUES ('MUSICIAN', 'Musico', CURRENT_TIMESTAMP)");
         Long roleId = roleRepository.findByName("MUSICIAN").orElseThrow().getId();
         insertUser(roleId, "owner", "owner@auramusic.local");
+        insertUser(roleId, "member", "member@auramusic.local");
         insertUser(roleId, "outsider", "outsider@auramusic.local");
 
         jdbcTemplate.update("INSERT INTO artists (name, created_at, updated_at) VALUES ('Test Artist', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
@@ -79,6 +81,7 @@ class SetlistIntegrationTests {
         secondSong = songRepository.findAll().stream().filter(song -> song.getTitle().equals("Song Two")).findFirst().orElseThrow();
 
         Long ownerId = userRepository.findByEmail("owner@auramusic.local").orElseThrow().getId();
+        Long memberId = userRepository.findByEmail("member@auramusic.local").orElseThrow().getId();
         jdbcTemplate.update("""
                 INSERT INTO bands (leader_user_id, name, description, invite_code, created_at, updated_at)
                 VALUES (?, 'Test Band', 'Banda de prueba', 'SETLIST-BAND-1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -88,6 +91,10 @@ class SetlistIntegrationTests {
                 INSERT INTO band_members (band_id, user_id, instrument, member_role, joined_at)
                 VALUES (?, ?, 'Voz', 'LEADER', CURRENT_TIMESTAMP)
                 """, bandId, ownerId);
+        jdbcTemplate.update("""
+                INSERT INTO band_members (band_id, user_id, instrument, member_role, joined_at)
+                VALUES (?, ?, 'Guitarra', 'MEMBER', CURRENT_TIMESTAMP)
+                """, bandId, memberId);
     }
 
     @Test
@@ -148,6 +155,80 @@ class SetlistIntegrationTests {
 
         mockMvc.perform(get("/api/setlists/{id}", setlist.getId()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "member@auramusic.local", roles = "MUSICIAN")
+    void bandMemberCanReadBandSetlist() throws Exception {
+        Long ownerId = userRepository.findByEmail("owner@auramusic.local").orElseThrow().getId();
+        Long bandId = bandRepository.findByInviteCode("SETLIST-BAND-1").orElseThrow().getId();
+        jdbcTemplate.update("""
+                INSERT INTO setlists (owner_user_id, band_id, name, description, created_at, updated_at)
+                VALUES (?, ?, 'Band Set', 'Compartido', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, ownerId, bandId);
+        Setlist setlist = setlistRepository.findByBandId(bandId).stream()
+                .filter(value -> value.getName().equals("Band Set"))
+                .findFirst()
+                .orElseThrow();
+
+        mockMvc.perform(get("/api/setlists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Band Set"))
+                .andExpect(jsonPath("$[0].bandId").value(bandId));
+
+        mockMvc.perform(get("/api/setlists/{id}", setlist.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Band Set"));
+    }
+
+    @Test
+    @WithMockUser(username = "member@auramusic.local", roles = "MUSICIAN")
+    void bandMemberCanModifyBandSetlist() throws Exception {
+        Long ownerId = userRepository.findByEmail("owner@auramusic.local").orElseThrow().getId();
+        Long bandId = bandRepository.findByInviteCode("SETLIST-BAND-1").orElseThrow().getId();
+        jdbcTemplate.update("""
+                INSERT INTO setlists (owner_user_id, band_id, name, description, created_at, updated_at)
+                VALUES (?, ?, 'Editable Band Set', 'Compartido', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, ownerId, bandId);
+        Setlist setlist = setlistRepository.findByBandId(bandId).stream()
+                .filter(value -> value.getName().equals("Editable Band Set"))
+                .findFirst()
+                .orElseThrow();
+
+        mockMvc.perform(put("/api/setlists/{id}", setlist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Setlist editado\",\"description\":\"Actualizado\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Setlist editado"));
+
+        mockMvc.perform(post("/api/setlists/{id}/items", setlist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"songId\":%d}".formatted(firstSong.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].song.id").value(firstSong.getId()));
+    }
+
+    @Test
+    @WithMockUser(username = "member@auramusic.local", roles = "MUSICIAN")
+    void memberJoiningAfterSetlistCreationCanStillSeeBandSetlist() throws Exception {
+        Long ownerId = userRepository.findByEmail("owner@auramusic.local").orElseThrow().getId();
+        Long memberId = userRepository.findByEmail("member@auramusic.local").orElseThrow().getId();
+        Long bandId = bandRepository.findByInviteCode("SETLIST-BAND-1").orElseThrow().getId();
+
+        jdbcTemplate.update("DELETE FROM band_members WHERE band_id = ? AND user_id = ?", bandId, memberId);
+        jdbcTemplate.update("""
+                INSERT INTO setlists (owner_user_id, band_id, name, description, created_at, updated_at)
+                VALUES (?, ?, 'Setlist Antes Del Integrante', 'Creado antes de la union', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, ownerId, bandId);
+        jdbcTemplate.update("""
+                INSERT INTO band_members (band_id, user_id, instrument, member_role, joined_at)
+                VALUES (?, ?, 'Guitarra', 'MEMBER', CURRENT_TIMESTAMP)
+                """, bandId, memberId);
+
+        mockMvc.perform(get("/api/setlists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Setlist Antes Del Integrante"))
+                .andExpect(jsonPath("$[0].bandId").value(bandId));
     }
 
     @Test

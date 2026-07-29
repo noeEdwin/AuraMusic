@@ -301,7 +301,7 @@ function renderProfilePanel(role, band, user) {
             <span className="member-name">{member.user?.displayName ?? member.user?.username}</span>
             <span className="member-role">{member.instrument}</span>
           </div>
-          <span className="member-status online">{member.memberRole}</span>
+          <span className="member-status online">{formatMemberRole(member.memberRole)}</span>
         </div>
       ))}
     </div>
@@ -311,6 +311,12 @@ function renderProfilePanel(role, band, user) {
 function getInitials(value = '') {
   const parts = value.trim().split(/\s+/).filter(Boolean)
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'AM'
+}
+
+function formatMemberRole(memberRole) {
+  if (memberRole === 'LEADER') return 'Líder'
+  if (memberRole === 'MEMBER') return 'Integrante'
+  return memberRole ?? 'Integrante'
 }
 
 function formatDuration(durationSeconds) {
