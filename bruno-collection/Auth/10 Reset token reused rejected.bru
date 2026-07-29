@@ -1,0 +1,22 @@
+meta {
+  name: Reset token reused rejected
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/auth/reset-password
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token": "{{resetToken}}",
+    "password": "OtraClave1!"
+  }
+}

@@ -2,22 +2,29 @@ package com.auramusic.backend.auth;
 
 import com.auramusic.backend.auth.dto.AuthResponse;
 import com.auramusic.backend.auth.dto.CurrentUserResponse;
+import com.auramusic.backend.auth.dto.ForgotPasswordRequest;
 import com.auramusic.backend.auth.dto.LoginRequest;
 import com.auramusic.backend.auth.dto.RegisterRequest;
+import com.auramusic.backend.auth.dto.ResetPasswordRequest;
+import com.auramusic.backend.domain.entity.PasswordResetToken;
 import com.auramusic.backend.domain.entity.RevokedToken;
 import com.auramusic.backend.domain.entity.Role;
 import com.auramusic.backend.domain.entity.User;
 import com.auramusic.backend.repository.RevokedTokenRepository;
 import com.auramusic.backend.repository.RoleRepository;
+import com.auramusic.backend.repository.PasswordResetTokenRepository;
 import com.auramusic.backend.repository.UserRepository;
 import com.auramusic.backend.security.JwtService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.security.SecureRandom;
+import java.util.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.auramusic.backend.notification.MailNotificationService;
 
 @Service
 public class AuthService {
@@ -32,19 +39,29 @@ public class AuthService {
     private final RevokedTokenRepository revokedTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final MailNotificationService mailNotificationService;
+    private final long passwordResetExpirationMinutes;
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public AuthService(
             UserRepository userRepository,
             RoleRepository roleRepository,
             RevokedTokenRepository revokedTokenRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            MailNotificationService mailNotificationService,
+            @org.springframework.beans.factory.annotation.Value("${auramusic.auth.password-reset-expiration-minutes:15}") long passwordResetExpirationMinutes
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.revokedTokenRepository = revokedTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.mailNotificationService = mailNotificationService;
+        this.passwordResetExpirationMinutes = passwordResetExpirationMinutes;
     }
 
     @Transactional(readOnly = true)
@@ -87,7 +104,39 @@ public class AuthService {
         user.setEnabled(true);
 
         User savedUser = userRepository.save(user);
+        mailNotificationService.sendWelcome(savedUser);
         return createAuthResponse(savedUser);
+    }
+
+    @Transactional
+    public void requestPasswordReset(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.email()).ifPresent(user -> {
+            passwordResetTokenRepository.deleteByUserIdAndUsedFalse(user.getId());
+            String token = generateResetToken();
+
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setUser(user);
+            resetToken.setTokenHash(jwtService.hashToken(token));
+            resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(passwordResetExpirationMinutes));
+            resetToken.setUsed(false);
+            passwordResetTokenRepository.save(resetToken);
+            mailNotificationService.sendPasswordReset(user, token, passwordResetExpirationMinutes);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(jwtService.hashToken(request.token()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "El token de recuperacion no es valido"));
+        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El token de recuperacion expiro");
+        }
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        userRepository.save(user);
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
     }
 
     @Transactional(readOnly = true)
@@ -113,5 +162,11 @@ public class AuthService {
     private AuthResponse createAuthResponse(User user) {
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, TOKEN_TYPE, jwtService.getExpirationMs(), CurrentUserResponse.from(user));
+    }
+
+    private String generateResetToken() {
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 }

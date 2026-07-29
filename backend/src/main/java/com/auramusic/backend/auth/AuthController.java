@@ -2,9 +2,11 @@ package com.auramusic.backend.auth;
 
 import com.auramusic.backend.auth.dto.AuthResponse;
 import com.auramusic.backend.auth.dto.CurrentUserResponse;
+import com.auramusic.backend.auth.dto.ForgotPasswordRequest;
 import com.auramusic.backend.auth.dto.LoginRequest;
 import com.auramusic.backend.auth.dto.MessageResponse;
 import com.auramusic.backend.auth.dto.RegisterRequest;
+import com.auramusic.backend.auth.dto.ResetPasswordRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,18 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public MessageResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request);
+        return new MessageResponse("Si el correo esta registrado, recibiras instrucciones para restablecer tu contrasena");
+    }
+
+    @PostMapping("/reset-password")
+    public MessageResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return new MessageResponse("La contrasena fue actualizada correctamente");
     }
 
     @GetMapping("/me")
