@@ -92,6 +92,14 @@ function App() {
         )}
       />
       <Route
+        path="/bands/join"
+        element={(
+          <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
+            <BandsView />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
         path="/setlists/:setlistId"
         element={(
           <ProtectedRoute allowedRoles={['ADMIN', 'MUSICIAN', 'SOLO']}>
