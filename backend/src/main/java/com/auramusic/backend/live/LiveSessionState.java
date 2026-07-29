@@ -8,10 +8,11 @@ public record LiveSessionState(
         Long setlistId,
         Long activeItemId,
         boolean playing,
-        int positionSeconds,
+        long positionMillis,
+        double playbackRate,
         Instant updatedAt
 ) {
     public static LiveSessionState inactive(Long bandId) {
-        return new LiveSessionState(bandId, false, null, null, false, 0, Instant.now());
+        return new LiveSessionState(bandId, false, null, null, false, 0, 1.0, Instant.now());
     }
 }

@@ -14,7 +14,7 @@ import '../catalog/catalog.css'
 import './teleprompter.css'
 
 const TELEPROMPTER_PAGE_SIZE = 20
-const AUTO_SCROLL_PIXELS_PER_SECOND = 42
+const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2]
 
 export function TeleprompterView() {
   const navigate = useNavigate()
@@ -22,6 +22,8 @@ export function TeleprompterView() {
   const { token } = useAuth()
   const scrollAreaRef = useRef(null)
   const liveClientRef = useRef(null)
+  const localPositionRef = useRef(0)
+  const localPlaybackStartedAtRef = useRef(null)
   const [songs, setSongs] = useState([])
   const [liveSetlist, setLiveSetlist] = useState(null)
   const [liveSessionState, setLiveSessionState] = useState(null)
@@ -37,6 +39,7 @@ export function TeleprompterView() {
   const [saveError, setSaveError] = useState('')
   const [saveMessage, setSaveMessage] = useState('')
   const [fontSizeScale, setFontSizeScale] = useState(1)
+  const [playbackRate, setPlaybackRate] = useState(1)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const bandId = searchParams.get('bandId')
@@ -156,7 +159,8 @@ export function TeleprompterView() {
       onState: (state) => {
         if (disposed) return
 
-        setLiveSessionState(state)
+        setLiveSessionState({ ...state, receivedAt: Date.now() })
+        setPlaybackRate(state.playbackRate ?? 1)
         setIsAutoScrollEnabled(Boolean(state.active && state.playing))
 
         const activeItem = liveSetlist.items?.find((item) => String(item.id) === String(state.activeItemId))
@@ -181,19 +185,12 @@ export function TeleprompterView() {
     setLyricsDraft('')
     setSaveError('')
     setSaveMessage('')
+    localPositionRef.current = 0
+    localPlaybackStartedAtRef.current = null
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = 0
     }
   }, [isLiveMode, selectedSongId])
-
-  useEffect(() => {
-    if (!isLiveMode || !liveSessionState?.active || !scrollAreaRef.current) return
-
-    const targetScrollTop = liveSessionState.positionSeconds * AUTO_SCROLL_PIXELS_PER_SECOND
-    if (Math.abs(scrollAreaRef.current.scrollTop - targetScrollTop) > 28) {
-      scrollAreaRef.current.scrollTop = targetScrollTop
-    }
-  }, [isLiveMode, liveSessionState?.active, liveSessionState?.activeItemId, liveSessionState?.positionSeconds, selectedSongId])
 
   useEffect(() => {
     if (!isAutoScrollEnabled || !scrollAreaRef.current) {
@@ -202,23 +199,31 @@ export function TeleprompterView() {
 
     const scrollElement = scrollAreaRef.current
     let frameId = 0
-    let previousTimestamp = null
 
     function step(timestamp) {
-      const reachedBottom = scrollElement.scrollTop + scrollElement.clientHeight >= scrollElement.scrollHeight - 2
+      const durationMillis = Math.max(1, Number(selectedSong?.durationSeconds ?? 1) * 1000)
+      const positionMillis = isLiveMode
+        ? getProjectedLivePosition(liveSessionState)
+        : localPositionRef.current
+          + (localPlaybackStartedAtRef.current === null
+            ? 0
+            : (timestamp - localPlaybackStartedAtRef.current) * playbackRate)
+      const progress = Math.min(1, Math.max(0, positionMillis / durationMillis))
+      const maximumScroll = Math.max(0, scrollElement.scrollHeight - scrollElement.clientHeight)
+      scrollElement.scrollTop = progress * maximumScroll
 
-      if (reachedBottom) {
+      if (progress >= 1) {
         if (isLiveMode && !canControlLiveSession) return
         setIsAutoScrollEnabled(false)
-        if (isLiveMode) liveClientRef.current?.publish({ type: 'PAUSE' })
+        localPositionRef.current = durationMillis
+        localPlaybackStartedAtRef.current = null
+        if (isLiveMode) {
+          liveClientRef.current?.publish({ type: 'SEEK', positionMillis: durationMillis })
+          liveClientRef.current?.publish({ type: 'PAUSE' })
+        }
         return
       }
 
-      if (previousTimestamp !== null) {
-        const elapsedMilliseconds = Math.min(timestamp - previousTimestamp, 50)
-        scrollElement.scrollTop += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedMilliseconds / 1000
-      }
-      previousTimestamp = timestamp
       frameId = window.requestAnimationFrame(step)
     }
 
@@ -227,23 +232,33 @@ export function TeleprompterView() {
     return () => {
       window.cancelAnimationFrame(frameId)
     }
-  }, [canControlLiveSession, isAutoScrollEnabled, isLiveMode, selectedSongId])
+  }, [canControlLiveSession, isAutoScrollEnabled, isLiveMode, liveSessionState, playbackRate, selectedSong?.durationSeconds, selectedSongId])
 
   useEffect(() => {
-    if (!isLiveMode || !canControlLiveSession || liveConnectionState !== 'connected' || !liveSessionState?.active || !isAutoScrollEnabled) {
-      return undefined
-    }
+    if (!isLiveMode || liveSessionState?.playing || !scrollAreaRef.current) return
 
-    const intervalId = window.setInterval(() => {
-      publishCurrentLivePosition()
-    }, 2000)
+    const durationMillis = Math.max(1, Number(selectedSong?.durationSeconds ?? 1) * 1000)
+    const progress = Math.min(1, Math.max(0, Number(liveSessionState?.positionMillis ?? 0) / durationMillis))
+    const maximumScroll = Math.max(0, scrollAreaRef.current.scrollHeight - scrollAreaRef.current.clientHeight)
+    scrollAreaRef.current.scrollTop = progress * maximumScroll
+  }, [fontSizeScale, isLiveMode, liveSessionState?.playing, liveSessionState?.positionMillis, selectedSong?.durationSeconds, selectedSongId])
 
-    return () => window.clearInterval(intervalId)
-  }, [canControlLiveSession, isAutoScrollEnabled, isLiveMode, liveConnectionState, liveSessionState?.active])
+  function getLocalPlaybackPosition(timestamp = window.performance.now()) {
+    if (localPlaybackStartedAtRef.current === null) return localPositionRef.current
+    return localPositionRef.current + (timestamp - localPlaybackStartedAtRef.current) * playbackRate
+  }
 
   function togglePlayback() {
     if (!isLiveMode) {
-      setIsAutoScrollEnabled((current) => !current)
+      if (isAutoScrollEnabled) {
+        localPositionRef.current = getLocalPlaybackPosition()
+        localPlaybackStartedAtRef.current = null
+        setIsAutoScrollEnabled(false)
+      } else {
+        localPositionRef.current = getPositionFromScroll(scrollAreaRef.current, selectedSong?.durationSeconds)
+        localPlaybackStartedAtRef.current = window.performance.now()
+        setIsAutoScrollEnabled(true)
+      }
       return
     }
 
@@ -262,8 +277,26 @@ export function TeleprompterView() {
 
     return liveClientRef.current?.publish({
       type: 'SEEK',
-      positionSeconds: Math.max(0, Math.round(scrollAreaRef.current.scrollTop / AUTO_SCROLL_PIXELS_PER_SECOND)),
+      positionMillis: getPositionFromScroll(scrollAreaRef.current, selectedSong?.durationSeconds),
     }) ?? false
+  }
+
+  function changePlaybackRate(nextRate) {
+    if (isLiveMode) {
+      if (liveConnectionState !== 'connected' || !liveSessionState?.active || !canControlLiveSession) {
+        setLiveError('La velocidad solo puede cambiarse durante una sesion conectada.')
+        return
+      }
+      const sent = liveClientRef.current?.publish({ type: 'SET_RATE', playbackRate: nextRate })
+      if (!sent) setLiveError('No fue posible cambiar la velocidad de la sesion.')
+      return
+    }
+
+    if (isAutoScrollEnabled) {
+      localPositionRef.current = getLocalPlaybackPosition()
+      localPlaybackStartedAtRef.current = window.performance.now()
+    }
+    setPlaybackRate(nextRate)
   }
 
   function changeLiveSong(offset) {
@@ -294,6 +327,7 @@ export function TeleprompterView() {
   function resetAdjustments() {
     setTransposeSteps(0)
     setFontSizeScale(1)
+    changePlaybackRate(1)
   }
 
   function startEditingLyrics() {
@@ -361,6 +395,19 @@ export function TeleprompterView() {
               <button className="teleprompter-action-button teleprompter-font-button" type="button" onClick={increaseFontSize}>
                 A+
               </button>
+              <div className="teleprompter-speed-controls" aria-label="Velocidad del auto-scroll">
+                {PLAYBACK_RATES.map((rate) => (
+                  <button
+                    key={rate}
+                    className={`teleprompter-speed-button${playbackRate === rate ? ' is-active' : ''}`}
+                    type="button"
+                    aria-pressed={playbackRate === rate}
+                    onClick={() => changePlaybackRate(rate)}
+                  >
+                    {rate}x
+                  </button>
+                ))}
+              </div>
               <button className="teleprompter-action-button teleprompter-reset-button" type="button" onClick={resetAdjustments}>
                 Reset
               </button>
@@ -484,7 +531,7 @@ export function TeleprompterView() {
 
           <div className="teleprompter-footer-group">
             <span className="teleprompter-footer-label">Auto-scroll</span>
-            <strong>{isAutoScrollEnabled ? 'Activo' : 'Pausado'}</strong>
+            <strong>{isAutoScrollEnabled ? `Activo · ${playbackRate}x` : `Pausado · ${playbackRate}x`}</strong>
           </div>
 
           <div className="teleprompter-footer-group teleprompter-bpm-box">
@@ -543,4 +590,23 @@ function getAdjacentLiveItem(setlist, sessionState, offset) {
   const items = setlist?.items ?? []
   const activeIndex = items.findIndex((item) => String(item.id) === String(sessionState?.activeItemId))
   return activeIndex < 0 ? null : items[activeIndex + offset] ?? null
+}
+
+function getProjectedLivePosition(sessionState) {
+  if (!sessionState) return 0
+
+  const positionMillis = Number(sessionState.positionMillis ?? 0)
+  if (!sessionState.playing) return positionMillis
+
+  const receivedAt = Number(sessionState.receivedAt ?? Date.parse(sessionState.updatedAt))
+  const elapsedMillis = Number.isNaN(receivedAt) ? 0 : Math.max(0, Date.now() - receivedAt)
+  return positionMillis + elapsedMillis * Number(sessionState.playbackRate ?? 1)
+}
+
+function getPositionFromScroll(scrollElement, durationSeconds) {
+  if (!scrollElement) return 0
+
+  const maximumScroll = Math.max(0, scrollElement.scrollHeight - scrollElement.clientHeight)
+  const progress = maximumScroll === 0 ? 0 : scrollElement.scrollTop / maximumScroll
+  return Math.max(0, Math.round(progress * Number(durationSeconds ?? 0) * 1000))
 }

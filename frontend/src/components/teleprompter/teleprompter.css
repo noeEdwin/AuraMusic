@@ -102,6 +102,35 @@
   color: #edf0ff;
 }
 
+.teleprompter-speed-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(191, 198, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.teleprompter-speed-button {
+  min-width: 42px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #9ea3b9;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.teleprompter-speed-button.is-active {
+  background: rgba(24, 232, 255, 0.14);
+  color: #7ff4ff;
+}
+
 .teleprompter-edit-button {
   justify-content: center;
   gap: 8px;
@@ -445,6 +474,41 @@
 }
 
 @media (max-width: 1160px) {
+.teleprompter-adjustments {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 5;
+    width: min(calc(100vw - 64px), 390px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(191, 198, 255, 0.12);
+    border-radius: 18px;
+    background: rgba(18, 22, 34, 0.98);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+  }
+
+.teleprompter-actions.is-open .teleprompter-adjustments {
+    display: grid;
+  }
+
+.teleprompter-speed-controls {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-radius: 16px;
+  }
+
+.teleprompter-speed-button {
+    width: 100%;
+  }
+
+.teleprompter-reset-button {
+    grid-column: 1 / -1;
+  }
+
 .teleprompter-toolbar {
     grid-template-columns: auto minmax(0, 1fr) 116px;
     align-items: stretch;

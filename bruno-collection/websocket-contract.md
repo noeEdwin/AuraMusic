@@ -41,7 +41,8 @@ Ejemplos adicionales:
 { "type": "PLAY" }
 { "type": "PAUSE" }
 { "type": "CHANGE_SONG", "activeItemId": 2 }
-{ "type": "SEEK", "positionSeconds": 90 }
+{ "type": "SEEK", "positionMillis": 90000 }
+{ "type": "SET_RATE", "playbackRate": 1.25 }
 { "type": "CLOSE_SESSION" }
 ```
 

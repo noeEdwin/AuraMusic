@@ -4,6 +4,7 @@ import com.auramusic.backend.domain.entity.BandMember;
 import com.auramusic.backend.domain.entity.User;
 import com.auramusic.backend.repository.BandMemberRepository;
 import com.auramusic.backend.repository.UserRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +31,11 @@ public class LiveSessionService {
         String type = normalizeType(command.type());
 
         if ("SYNC_REQUEST".equals(type)) {
-            return sessions.getOrDefault(bandId, LiveSessionState.inactive(bandId));
+            LiveSessionState current = sessions.get(bandId);
+            if (current == null) {
+                return LiveSessionState.inactive(bandId);
+            }
+            return current.playing() ? materialize(current) : current;
         }
 
         if ("START_SESSION".equals(type)) {
@@ -45,6 +50,7 @@ public class LiveSessionService {
                     command.activeItemId(),
                     false,
                     0,
+                    1.0,
                     Instant.now()
             );
             sessions.put(bandId, state);
@@ -53,10 +59,11 @@ public class LiveSessionService {
 
         LiveSessionState current = sessions.get(bandId);
         if ("CLOSE_SESSION".equals(type)) {
-            LiveSessionState closed = current == null
+            LiveSessionState materialized = current == null ? null : materialize(current);
+            LiveSessionState closed = materialized == null
                     ? LiveSessionState.inactive(bandId)
                     : new LiveSessionState(bandId, false, current.setlistId(), current.activeItemId(), false,
-                    current.positionSeconds(), Instant.now());
+                    materialized.positionMillis(), current.playbackRate(), Instant.now());
             sessions.remove(bandId);
             return closed;
         }
@@ -66,22 +73,53 @@ public class LiveSessionService {
         }
 
         return switch (type) {
-            case "PLAY" -> update(current, true, current.activeItemId(), current.positionSeconds());
-            case "PAUSE" -> update(current, false, current.activeItemId(), current.positionSeconds());
-            case "CHANGE_SONG" -> update(current, current.playing(), requireValue(command.activeItemId(), "activeItemId"), 0);
-            case "SEEK" -> update(current, current.playing(), current.activeItemId(), requirePosition(command.positionSeconds()));
+            case "PLAY" -> updatePlayback(current, true);
+            case "PAUSE" -> updatePlayback(current, false);
+            case "CHANGE_SONG" -> update(current, current.playing(),
+                    requireValue(command.activeItemId(), "activeItemId"), 0, current.playbackRate());
+            case "SEEK" -> update(current, current.playing(), current.activeItemId(),
+                    requirePosition(command.positionMillis()), current.playbackRate());
+            case "SET_RATE" -> updatePlaybackRate(current, requirePlaybackRate(command.playbackRate()));
             default -> throw new MessagingException("Comando WebSocket no soportado: " + type);
         };
     }
 
-    private LiveSessionState update(LiveSessionState current, boolean playing, Long activeItemId, int positionSeconds) {
+    private LiveSessionState updatePlayback(LiveSessionState current, boolean playing) {
+        LiveSessionState materialized = materialize(current);
+        return update(materialized, playing, current.activeItemId(), materialized.positionMillis(),
+                current.playbackRate());
+    }
+
+    private LiveSessionState updatePlaybackRate(LiveSessionState current, double playbackRate) {
+        LiveSessionState materialized = materialize(current);
+        return update(materialized, current.playing(), current.activeItemId(), materialized.positionMillis(), playbackRate);
+    }
+
+    private LiveSessionState materialize(LiveSessionState current) {
+        if (!current.playing()) {
+            return current;
+        }
+
+        long elapsedMillis = Math.max(0, Duration.between(current.updatedAt(), Instant.now()).toMillis());
+        long positionMillis = current.positionMillis() + Math.round(elapsedMillis * current.playbackRate());
+        return update(current, true, current.activeItemId(), positionMillis, current.playbackRate());
+    }
+
+    private LiveSessionState update(
+            LiveSessionState current,
+            boolean playing,
+            Long activeItemId,
+            long positionMillis,
+            double playbackRate
+    ) {
         LiveSessionState updated = new LiveSessionState(
                 current.bandId(),
                 true,
                 current.setlistId(),
                 activeItemId,
                 playing,
-                positionSeconds,
+                positionMillis,
+                playbackRate,
                 Instant.now()
         );
         sessions.put(current.bandId(), updated);
@@ -109,10 +147,17 @@ public class LiveSessionService {
         return value;
     }
 
-    private int requirePosition(Integer position) {
+    private long requirePosition(Long position) {
         if (position == null || position < 0) {
-            throw new MessagingException("positionSeconds debe ser mayor o igual a cero");
+            throw new MessagingException("positionMillis debe ser mayor o igual a cero");
         }
         return position;
+    }
+
+    private double requirePlaybackRate(Double playbackRate) {
+        if (playbackRate == null || playbackRate < 0.5 || playbackRate > 2.0) {
+            throw new MessagingException("playbackRate debe estar entre 0.5 y 2.0");
+        }
+        return playbackRate;
     }
 }

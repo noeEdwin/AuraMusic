@@ -45,12 +45,12 @@ class LiveSessionServiceTests {
 
         LiveSessionState started = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("START_SESSION", 4L, 12L, null),
+                new LiveSessionCommand("START_SESSION", 4L, 12L, null, null),
                 leader.getEmail()
         );
         LiveSessionState playing = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("PLAY", null, null, null),
+                new LiveSessionCommand("PLAY", null, null, null, null),
                 leader.getEmail()
         );
 
@@ -71,17 +71,17 @@ class LiveSessionServiceTests {
         when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, member.getId()))
                 .thenReturn(Optional.of(member("MEMBER")));
 
-        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null), leader.getEmail());
+        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null, null), leader.getEmail());
         LiveSessionState synchronizedState = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("SYNC_REQUEST", null, null, null),
+                new LiveSessionCommand("SYNC_REQUEST", null, null, null, null),
                 member.getEmail()
         );
 
         assertTrue(synchronizedState.active());
         LiveSessionState paused = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("PAUSE", null, null, null),
+                new LiveSessionCommand("PAUSE", null, null, null, null),
                 member.getEmail()
         );
 
@@ -101,12 +101,12 @@ class LiveSessionServiceTests {
 
         LiveSessionState started = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("START_SESSION", 9L, 21L, null),
+                new LiveSessionCommand("START_SESSION", 9L, 21L, null, null),
                 member.getEmail()
         );
         LiveSessionState joined = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("START_SESSION", 99L, 99L, null),
+                new LiveSessionCommand("START_SESSION", 99L, 99L, null, null),
                 leader.getEmail()
         );
 
@@ -122,7 +122,7 @@ class LiveSessionServiceTests {
 
         assertThrows(MessagingException.class, () -> service.handle(
                 BAND_ID,
-                new LiveSessionCommand("SYNC_REQUEST", null, null, null),
+                new LiveSessionCommand("SYNC_REQUEST", null, null, null, null),
                 user.getEmail()
         ));
     }
@@ -134,20 +134,59 @@ class LiveSessionServiceTests {
         when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, leader.getId()))
                 .thenReturn(Optional.of(member("LEADER")));
 
-        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null), leader.getEmail());
+        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null, null), leader.getEmail());
         LiveSessionState closed = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("CLOSE_SESSION", null, null, null),
+                new LiveSessionCommand("CLOSE_SESSION", null, null, null, null),
                 leader.getEmail()
         );
         LiveSessionState afterClose = service.handle(
                 BAND_ID,
-                new LiveSessionCommand("SYNC_REQUEST", null, null, null),
+                new LiveSessionCommand("SYNC_REQUEST", null, null, null, null),
                 leader.getEmail()
         );
 
         assertFalse(closed.active());
         assertFalse(afterClose.active());
+    }
+
+    @Test
+    void seekAndPlaybackRateAreSharedWithLateJoiners() {
+        User leader = user(11L, "leader@auramusic.local");
+        when(userRepository.findByEmail(leader.getEmail())).thenReturn(Optional.of(leader));
+        when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, leader.getId()))
+                .thenReturn(Optional.of(member("LEADER")));
+
+        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null, null), leader.getEmail());
+        service.handle(BAND_ID, new LiveSessionCommand("SEEK", null, null, 45_000L, null), leader.getEmail());
+        service.handle(BAND_ID, new LiveSessionCommand("SET_RATE", null, null, null, 1.5), leader.getEmail());
+        LiveSessionState synchronizedState = service.handle(
+                BAND_ID,
+                new LiveSessionCommand("SYNC_REQUEST", null, null, null, null),
+                leader.getEmail()
+        );
+
+        assertEquals(45_000L, synchronizedState.positionMillis());
+        assertEquals(1.5, synchronizedState.playbackRate());
+    }
+
+    @Test
+    void changingSongResetsPlaybackPosition() {
+        User leader = user(11L, "leader@auramusic.local");
+        when(userRepository.findByEmail(leader.getEmail())).thenReturn(Optional.of(leader));
+        when(bandMemberRepository.findByBandIdAndUserId(BAND_ID, leader.getId()))
+                .thenReturn(Optional.of(member("LEADER")));
+
+        service.handle(BAND_ID, new LiveSessionCommand("START_SESSION", 4L, 12L, null, null), leader.getEmail());
+        service.handle(BAND_ID, new LiveSessionCommand("SEEK", null, null, 45_000L, null), leader.getEmail());
+        LiveSessionState changed = service.handle(
+                BAND_ID,
+                new LiveSessionCommand("CHANGE_SONG", null, 13L, null, null),
+                leader.getEmail()
+        );
+
+        assertEquals(13L, changed.activeItemId());
+        assertEquals(0L, changed.positionMillis());
     }
 
     private User user(Long id, String email) {
