@@ -32,12 +32,17 @@
 
 [![Aplicación](https://img.shields.io/badge/Aplicación-auramusic.lat-7C5CFC?style=for-the-badge)](https://auramusic.lat/)
 [![API](https://img.shields.io/badge/API-auramusic.lat/api-18B8D9?style=for-the-badge)](https://auramusic.lat/api)
+[![Repositorio](https://img.shields.io/badge/GitHub-Repositorio-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/noeEdwin/AuraMusic)
 [![Figma](https://img.shields.io/badge/Figma-Prototipo-F24E1E?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/proto/s7oFlIuYV5DgC4CicLWw3i/AuraMusic?node-id=0-1&t=KfZjk4YLt9lxOzEn-1)
 [![GitHub Projects](https://img.shields.io/badge/GitHub-Project-181717?style=for-the-badge&logo=github)](https://github.com/users/noeEdwin/projects/1)
 
-**Aplicación desplegada:** [https://auramusic.lat/](https://auramusic.lat/)  
-**URL base de la API:** [https://auramusic.lat/api](https://auramusic.lat/api)  
-**Repositorio público:** [https://github.com/noeEdwin/AuraMusic](https://github.com/noeEdwin/AuraMusic)
+| Recurso | Enlace |
+|---|---|
+| **Aplicación desplegada** | [https://auramusic.lat/](https://auramusic.lat/) |
+| **URL base de la API** | [https://auramusic.lat/api](https://auramusic.lat/api) |
+| **Repositorio público** | [https://github.com/noeEdwin/AuraMusic](https://github.com/noeEdwin/AuraMusic) |
+| **Prototipo navegable en Figma** | [Abrir prototipo de AuraMusic](https://www.figma.com/proto/s7oFlIuYV5DgC4CicLWw3i/AuraMusic?node-id=0-1&t=KfZjk4YLt9lxOzEn-1) |
+| **GitHub Projects** | [Abrir tablero público](https://github.com/users/noeEdwin/projects/1) |
 
 </div>
 
@@ -206,18 +211,22 @@ El seed local también crea usuarios de ejemplo con roles `MUSICIAN` y `SOLO`. E
 
 ## Arquitectura
 
-```mermaid
-flowchart LR
-    USER[Usuario] -->|HTTPS| NGINX[Nginx + Let's Encrypt]
-    NGINX -->|Archivos estáticos| REACT[React / Vite]
-    REACT -->|Axios + JWT| NGINX
-    REACT <-->|STOMP / WebSocket| NGINX
-    NGINX -->|/api → 127.0.0.1:8090| API[Spring Boot]
-    NGINX <-->|/ws → 127.0.0.1:8090| API
-    API -->|JPA| MYSQL[(MySQL 8)]
-    API -->|SMTP local| POSTFIX[Postfix]
-    POSTFIX --> RELAY[Relay SMTP]
-    API -->|REST| TWILIO[Twilio SMS]
+```text
+Usuario
+   |
+   | HTTPS
+   v
+Nginx + Let's Encrypt
+   |
+   +-- Archivos estáticos --> React / Vite
+   |
+   +-- /api/ --> Spring Boot :8090 --> MySQL 8
+   |                 |
+   |                 +-- SMTP --> Postfix --> Relay SMTP
+   |                 |
+   |                 +-- REST --> Twilio --> SMS
+   |
+   +-- /ws --> Spring WebSocket / STOMP
 ```
 
 En producción, Nginx sirve el build del frontend y dirige `/api/` y `/ws` al backend Spring Boot. El backend se ejecuta como JAR mediante `systemd` y escucha internamente en `127.0.0.1:8090`.
