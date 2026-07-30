@@ -1,0 +1,27 @@
+meta {
+  name: Musician cannot create admin
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{musicianToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "forbidden.admin",
+    "email": "forbidden.admin@auramusic.local",
+    "phone": "+529518695424",
+    "password": "AuraAdmin3!",
+    "displayName": "Forbidden Admin",
+    "role": "ADMIN"
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Deactivate user
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/users/{{adminUserId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

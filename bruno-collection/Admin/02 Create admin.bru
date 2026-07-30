@@ -1,0 +1,33 @@
+meta {
+  name: Create admin
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "bruno.second.admin",
+    "email": "bruno.second.admin@auramusic.local",
+    "phone": "+529518695423",
+    "password": "AuraAdmin2!",
+    "displayName": "Bruno Second Admin",
+    "avatarUrl": "",
+    "role": "ADMIN"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setVar("adminUserId", data.id);
+}

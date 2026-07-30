@@ -1,6 +1,6 @@
 # AuraMusic API Bruno Collection
 
-Coleccion Bruno para validar autenticacion, autorizacion, catalogo, bandas, setlists y el contrato WebSocket.
+Coleccion Bruno para validar autenticacion, autorizacion, administracion, catalogo, bandas, setlists y el contrato WebSocket.
 
 ## Uso
 
@@ -37,6 +37,8 @@ No contiene credenciales de produccion ni secretos.
 - Bandas, integrantes, invitaciones, actualización, eliminación y liderazgo.
 - Restriccion `403` para creación de banda por `SOLO`.
 - Setlists, items, actualización, eliminación, reordenamiento, duplicación y duración.
+- CRUD administrativo de usuarios y creación de cuentas `ADMIN`.
+- Restricción `403` al usar rutas administrativas con un token que no sea `ADMIN`.
 
 ## Variables
 
@@ -54,6 +56,7 @@ Los valores dinamicos se guardan en el ambiente local durante la ejecucion:
 - `memberId`
 - `setlistId`
 - `itemId`
+- `adminUserId`
 
 ## WebSocket
 
@@ -68,6 +71,14 @@ POST /api/auth/login
 POST /api/auth/register
 GET  /api/auth/me
 POST /api/auth/logout
+
+GET    /api/admin/summary
+GET    /api/admin/users
+GET    /api/admin/users/{id}
+POST   /api/admin/users
+PUT    /api/admin/users/{id}
+PUT    /api/admin/users/{id}/activate
+DELETE /api/admin/users/{id}
 
 GET    /api/artists
 GET    /api/artists/{id}

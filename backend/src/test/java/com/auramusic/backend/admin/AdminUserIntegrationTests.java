@@ -2,6 +2,7 @@ package com.auramusic.backend.admin;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,6 +44,9 @@ class AdminUserIntegrationTests {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private User admin;
     private User musician;
@@ -99,6 +104,72 @@ class AdminUserIntegrationTests {
     }
 
     @Test
+    void adminCanCreateAndGetAnotherAdmin() throws Exception {
+        String adminToken = tokenFor(admin, "ADMIN");
+
+        mockMvc.perform(post("/api/admin/users")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "second-admin",
+                                  "email": "SECOND.ADMIN@auramusic.local",
+                                  "phone": "+529518695423",
+                                  "password": "SecondAdmin1!",
+                                  "displayName": "Second Admin",
+                                  "avatarUrl": "",
+                                  "role": "ADMIN"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("second-admin"))
+                .andExpect(jsonPath("$.email").value("second.admin@auramusic.local"))
+                .andExpect(jsonPath("$.role").value("ADMIN"))
+                .andExpect(jsonPath("$.enabled").value(true));
+
+        User created = userRepository.findByEmail("second.admin@auramusic.local").orElseThrow();
+        org.junit.jupiter.api.Assertions.assertTrue(passwordEncoder.matches("SecondAdmin1!", created.getPasswordHash()));
+
+        mockMvc.perform(get("/api/admin/users/{id}", created.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(created.getId()))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@auramusic.local", roles = "ADMIN")
+    void adminCreationRejectsDuplicateEmailAndInvalidRole() throws Exception {
+        mockMvc.perform(post("/api/admin/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "new-admin",
+                                  "email": "duplicate@auramusic.local",
+                                  "phone": "+529518695423",
+                                  "password": "SecondAdmin1!",
+                                  "displayName": "Second Admin",
+                                  "role": "ADMIN"
+                                }
+                                """))
+                .andExpect(status().isConflict());
+
+        mockMvc.perform(post("/api/admin/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "new-admin",
+                                  "email": "new.admin@auramusic.local",
+                                  "phone": "+529518695423",
+                                  "password": "SecondAdmin1!",
+                                  "displayName": "Second Admin",
+                                  "role": "OWNER"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @WithMockUser(username = "admin@auramusic.local", roles = "ADMIN")
     void adminCannotUseAnotherUsersEmail() throws Exception {
         mockMvc.perform(put("/api/admin/users/{id}", musician.getId())
@@ -132,6 +203,26 @@ class AdminUserIntegrationTests {
     @Test
     @WithMockUser(username = "musician@auramusic.local", roles = "MUSICIAN")
     void nonAdminCannotUpdateOrDeactivateUsers() throws Exception {
+        mockMvc.perform(get("/api/admin/users"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/admin/users/{id}", admin.getId()))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/admin/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "forbidden-admin",
+                                  "email": "forbidden.admin@auramusic.local",
+                                  "phone": "+529518695423",
+                                  "password": "SecondAdmin1!",
+                                  "displayName": "Forbidden Admin",
+                                  "role": "ADMIN"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+
         mockMvc.perform(put("/api/admin/users/{id}", admin.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""

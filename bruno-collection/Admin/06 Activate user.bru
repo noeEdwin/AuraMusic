@@ -1,0 +1,15 @@
+meta {
+  name: Activate user
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/admin/users/{{adminUserId}}/activate
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

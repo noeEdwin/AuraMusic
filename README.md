@@ -525,6 +525,8 @@ Todas estas rutas requieren rol `ADMIN`.
 |---|---|---|
 | `GET` | `/api/admin/summary` | Resumen administrativo. |
 | `GET` | `/api/admin/users` | Listar usuarios. |
+| `GET` | `/api/admin/users/{id}` | Consultar usuario. |
+| `POST` | `/api/admin/users` | Crear usuario con rol `ADMIN`, `MUSICIAN` o `SOLO`. |
 | `PUT` | `/api/admin/users/{id}` | Actualizar usuario. |
 | `PUT` | `/api/admin/users/{id}/activate` | Reactivar usuario. |
 | `DELETE` | `/api/admin/users/{id}` | Soft delete (`enabled=false`). |
